@@ -1,4 +1,8 @@
-{% for dance in scheduled_dances %}
-    <h1>{{ dance.name }}</h1>
-    {% if dance.venue %}<h2>{{ dance.venue.name }}</h2>{% endif %}
-{% endfor %}
+{% extends "stepping_out/__base.html" %}
+
+{% block main %}
+    {% for dance in scheduled_dances %}
+        <h1>{{ dance.name }}</h1>
+        {% if dance.venue %}<h2>{{ dance.venue.name }}</h2>{% endif %}
+    {% endfor %}
+{% endblock %}
