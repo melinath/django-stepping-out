@@ -1,0 +1,4 @@
+*.pyc
+/stepping_out.egg-info/
+/test_stepping_out_project/test_stepping_out_project/media/
+/test_stepping_out_project/test_stepping_out_project/db.sl3

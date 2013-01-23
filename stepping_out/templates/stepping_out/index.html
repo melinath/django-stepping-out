@@ -1,0 +1,4 @@
+{% for dance in scheduled_dances %}
+    <h1>{{ dance.name }}</h1>
+    {% if dance.venue %}<h2>{{ dance.venue.name }}</h2>{% endif %}
+{% endfor %}
