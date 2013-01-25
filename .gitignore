@@ -1,5 +1,5 @@
 *.pyc
 .sass-cache
 /stepping_out.egg-info/
-/test_stepping_out_project/test_stepping_out_project/media/
-/test_stepping_out_project/test_stepping_out_project/db.sl3
+/test_project/test_project/media/
+/test_project/test_project/db.sl3
