@@ -14,5 +14,8 @@
                 {% endif %}
             </h4>
         {% endwith %}
+        {% if dance.venue %}
+            {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+        {% endif %}
     {% endfor %}
 {% endblock %}

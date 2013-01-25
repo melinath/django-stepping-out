@@ -6,9 +6,18 @@ from django.utils.translation import ugettext_lazy as _
 class Venue(models.Model):
     name = models.CharField(max_length=100)
     website = models.URLField(blank=True)
+    #: URL for a custom map (for hard-to-find venues.)
+    custom_map = models.URLField(blank=True,
+                                 help_text="The long form of the link to a "
+                                           "custom google map.")
     address = models.CharField(max_length=150)
     city = models.CharField(max_length=100, default='Seattle')
     state = USStateField(default='WA')
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    def __unicode__(self):
+        return self.name
 
 
 class Person(models.Model):
@@ -18,11 +27,17 @@ class Person(models.Model):
     user = models.OneToOneField('auth.User', blank=True, null=True)
     image = models.ImageField(upload_to='stepping_out/person/%Y/%m/%d', blank=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class LiveAct(models.Model):
     name = models.CharField(max_length=100)
     website = models.URLField(blank=True)
     image = models.ImageField(upload_to='stepping_out/live_music/%Y/%m/%d', blank=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class BaseTimeOrderModel(models.Model):
@@ -76,6 +91,9 @@ class Dance(BaseTimePriceModel):
     live_acts = models.ManyToManyField(LiveAct, through=DanceLiveAct, blank=True)
     scheduled_dance = models.ForeignKey('ScheduledDance', blank=True, null=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Lesson(BaseTimePriceModel):
     """
@@ -87,6 +105,9 @@ class Lesson(BaseTimePriceModel):
     venue = models.ForeignKey(Venue, blank=True, null=True)
     teachers = models.ManyToManyField(Person, blank=True)
     scheduled_lesson = models.ForeignKey('ScheduledLesson', blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class ScheduledDance(BaseTimePriceModel):

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from stepping_out.forms import ScheduledDanceForm
-from stepping_out.models import ScheduledLesson, ScheduledDance
+from stepping_out.forms import ScheduledDanceForm, VenueForm
+from stepping_out.models import ScheduledLesson, ScheduledDance, Venue
 
 
 class ScheduledLessonInline(admin.StackedInline):
@@ -36,4 +36,10 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     inlines = [ScheduledLessonInline]
 
 
+class VenueAdmin(admin.ModelAdmin):
+    model = Venue
+    form = VenueForm
+
+
 admin.site.register(ScheduledDance, ScheduledDanceAdmin)
+admin.site.register(Venue, VenueAdmin)

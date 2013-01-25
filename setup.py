@@ -29,5 +29,6 @@ setup(
     install_requires=[
         'django>=1.4',
         'Pillow>=1.1.7',
+        'pygeocoder>=1.1.4',
     ]
 )
