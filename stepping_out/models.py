@@ -118,6 +118,9 @@ class ScheduledDance(BaseTimePriceModel):
     def __unicode__(self):
         return self.name
 
+    def get_weeks(self):
+        return [week[1] for week in self.WEEK_CHOICES if unicode(week[0]) in self.weeks]
+
 
 class ScheduledLesson(BaseTimePriceModel):
     """
