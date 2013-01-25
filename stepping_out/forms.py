@@ -27,10 +27,13 @@ class VenueForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(VenueForm, self).clean()
+        fields = ('address', 'city', 'state')
+
         self._result = None
-        components = [cleaned_data.get(k)
-                      for k in ('address', 'city', 'state')]
-        if all(components):
+        components = [cleaned_data.get(f) for f in fields]
+        # Only do geocode query if all components are clean and
+        # at least one field has changed value.
+        if all(components) and any(f in self.changed_data for f in fields):
             address = " ".join(components)
             result = Geocoder.geocode(address)
             if not result.valid_address:
