@@ -5,20 +5,23 @@ from django.utils.translation import ugettext_lazy as _
 
 class Venue(models.Model):
     name = models.CharField(max_length=100)
-    address1 = models.CharField(max_length=150)
-    address2 = models.CharField(max_length=150, blank=True)
+    website = models.URLField(blank=True)
+    address = models.CharField(max_length=150)
     city = models.CharField(max_length=100, default='Seattle')
     state = USStateField(default='WA')
 
 
 class Person(models.Model):
     name = models.CharField(max_length=100)
+    bio = models.TextField(blank=True)
+    website = models.URLField(blank=True)
     user = models.OneToOneField('auth.User', blank=True, null=True)
     image = models.ImageField(upload_to='stepping_out/person/%Y/%m/%d', blank=True)
 
 
 class LiveAct(models.Model):
     name = models.CharField(max_length=100)
+    website = models.URLField(blank=True)
     image = models.ImageField(upload_to='stepping_out/live_music/%Y/%m/%d', blank=True)
 
 
@@ -111,6 +114,7 @@ class ScheduledDance(BaseTimePriceModel):
     WEEKLY = '1,2,3,4,5'
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    website = models.URLField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
     weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES)
     weeks = models.CommaSeparatedIntegerField(max_length=len(WEEKLY), default=WEEKLY)
