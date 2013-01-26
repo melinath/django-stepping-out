@@ -17,6 +17,7 @@ class ScheduledLessonInline(admin.StackedInline):
             'fields': ('price', 'student_price')
         })
     )
+    extra = 1
 
 
 class ScheduledDanceAdmin(admin.ModelAdmin):
@@ -24,7 +25,7 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
-            'fields': ('name', 'description'),
+            'fields': ('name', 'description', 'website'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'weekday', 'weeks'),
