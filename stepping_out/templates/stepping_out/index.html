@@ -2,11 +2,11 @@
 
 {% block main %}
     {% for dance in scheduled_dances %}
-        <h3>{{ dance.name }} {% if dance.venue %}<small>{{ dance.venue.name }}</small>{% endif %}</h3>
+        <h3>{% if dance.website %}<a href="{{ dance.website }}">{% endif %}{{ dance.name }}{% if dance.website %} <i class="icon-external-link"></i></a>{% endif %} <small>{% if dance.venue %}at {% if dance.venue.website %}<a href="{{ dance.venue.website }}">{% endif %}{{ dance.venue.name }}{% if dance.venue.website %} <i class="icon-external-link"></i></a>{% endif %}{% endif %}</small></h3>
         {% with weeks=dance.get_weeks %}
             <h4>
                 {% if weeks|length == 5 %}
-                    Weekly on {{ dance.get_weekday_display }}
+                    Every {{ dance.get_weekday_display }}
                 {% else %}
                     {% filter capfirst %}{% for week in weeks %}{% if forloop.last and not forloop.first %} and {% endif %}{{ week|lower }}{% if weeks|length > 2 and not forloop.last %}, {% endif %}{% endfor %}
                     {% endfilter %}
