@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from stepping_out.forms import ScheduledDanceForm, VenueForm
-from stepping_out.models import ScheduledLesson, ScheduledDance, Venue
+from stepping_out.models import (ScheduledLesson, ScheduledDance,
+                                 Venue, Dance, Lesson, Person)
 
 
 class ScheduledLessonInline(admin.StackedInline):
@@ -14,7 +15,8 @@ class ScheduledLessonInline(admin.StackedInline):
             'fields': ('venue', 'start', 'end', 'scheduled_dance'),
         }),
         ('Pricing', {
-            'fields': ('price', 'student_price', 'custom_price')
+            'fields': ('price', 'student_price', 'custom_price',
+                       'dance_included')
         })
     )
     extra = 1
@@ -22,7 +24,6 @@ class ScheduledLessonInline(admin.StackedInline):
 
 
 class ScheduledDanceAdmin(admin.ModelAdmin):
-    model = ScheduledLesson
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
@@ -40,10 +41,53 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
 
 
 class VenueAdmin(admin.ModelAdmin):
-    model = Venue
     form = VenueForm
+    prepopulated_fields = {"slug": ("name",)}
+
+
+class LessonInline(admin.StackedInline):
+    model = Lesson
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'description'),
+        }),
+        ('Scheduling', {
+            'fields': ('venue', 'start', 'end', 'dance',
+                       'teachers'),
+        }),
+        ('Pricing', {
+            'fields': ('price', 'student_price', 'custom_price',
+                       'dance_included')
+        })
+    )
+    extra = 1
+    prepopulated_fields = {"slug": ("name",)}
+    filter_horizontal = ('teachers',)
+
+
+class DanceAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'description'),
+        }),
+        ('Scheduling', {
+            'fields': ('venue', 'start', 'end', 'scheduled_dance',
+                       'hosts'),
+        }),
+        ('Pricing', {
+            'fields': ('price', 'student_price', 'custom_price')
+        })
+    )
+    inlines = [LessonInline]
+    prepopulated_fields = {"slug": ("name",)}
+    filter_horizontal = ('hosts',)
+
+
+class PersonAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
 
 admin.site.register(ScheduledDance, ScheduledDanceAdmin)
 admin.site.register(Venue, VenueAdmin)
+admin.site.register(Dance, DanceAdmin)
+admin.site.register(Person, PersonAdmin)

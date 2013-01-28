@@ -1,5 +1,8 @@
+import datetime
+
 from django.contrib.localflavor.us.models import USStateField
 from django.db import models
+from django.utils.timezone import get_current_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -29,6 +32,9 @@ class Person(models.Model):
     user = models.OneToOneField('auth.User', blank=True, null=True)
     image = models.ImageField(upload_to='stepping_out/person/%Y/%m/%d',
                               blank=True)
+
+    class Meta:
+        verbose_name_plural = u'people'
 
     def __unicode__(self):
         return self.name
@@ -182,6 +188,44 @@ class ScheduledDance(BasePriceModel):
         return [week[1] for week in self.WEEK_CHOICES
                 if unicode(week[0]) in self.weeks]
 
+    def get_or_create_next_dance(self):
+        today = datetime.date.today()
+        days = (7 - today.weekday() + self.weekday) % 7
+        start_day = today + datetime.timedelta(days)
+        tzinfo = get_current_timezone()
+        start = datetime.datetime.combine(start_day, self.start
+                                ).replace(tzinfo=tzinfo)
+        end = datetime.datetime.combine(start_day, self.end
+                              ).replace(tzinfo=tzinfo)
+        if end < start:
+            # Then it ends the next day.
+            end = end + datetime.timedelta(1)
+
+        defaults = {
+            'name': self.name,
+            'slug': self.slug,
+            'description': self.description,
+            'venue': self.venue,
+            'price': self.price,
+            'student_price': self.student_price,
+            'custom_price': self.custom_price,
+            'start': start,
+            'end': end,
+        }
+        utc_start = start.astimezone(utc)
+        kwargs = {
+            'start__year': utc_start.year,
+            'start__month': utc_start.month,
+            'start__day': utc_start.day,
+            'scheduled_dance': self
+        }
+        dance, created = Dance.objects.get_or_create(defaults=defaults,
+                                                     **kwargs)
+        if created:
+            for scheduled_lesson in self.scheduled_lessons.all():
+                scheduled_lesson.get_or_create_next_lesson(dance)
+        return dance, created
+
 
 class ScheduledLesson(BasePriceModel):
     """
@@ -197,6 +241,45 @@ class ScheduledLesson(BasePriceModel):
     start = models.TimeField(blank=True, null=True)
     end = models.TimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
+
+    def get_or_create_next_lesson(self, dance):
+        if dance.scheduled_dance != self.scheduled_dance:
+            raise ValueError
+        scheduled_dance = self.scheduled_dance
+        today = datetime.date.today()
+        days = (7 - today.weekday() + scheduled_dance.weekday) % 7
+        start_day = today + datetime.timedelta(days)
+        tzinfo = get_current_timezone()
+        start = datetime.datetime.combine(start_day, self.start
+                                ).replace(tzinfo=tzinfo)
+        end = datetime.datetime.combine(start_day, self.end
+                              ).replace(tzinfo=tzinfo)
+        if end < start:
+            # Then it ends the next day.
+            end = end + datetime.timedelta(1)
+
+        defaults = {
+            'name': self.name,
+            'slug': self.slug,
+            'description': self.description,
+            'venue': self.venue,
+            'price': self.price,
+            'student_price': self.student_price,
+            'custom_price': self.custom_price,
+            'start': start,
+            'end': end,
+            'dance_included': self.dance_included,
+            'dance': dance
+        }
+        utc_start = start.astimezone(utc)
+        kwargs = {
+            'start__year': utc_start.year,
+            'start__month': utc_start.month,
+            'start__day': utc_start.day,
+            'scheduled_lesson': self
+        }
+        return Lesson.objects.get_or_create(defaults=defaults,
+                                            **kwargs)
 
     class Meta:
         unique_together = ('slug', 'scheduled_dance')
