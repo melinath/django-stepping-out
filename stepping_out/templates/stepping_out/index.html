@@ -3,24 +3,34 @@
 {% load url from future %}
 
 {% block main %}
-    {% for dance in scheduled_dances %}
-        <h3><a href="{% url 'stepping_out_scheduled_dance_detail' slug=dance.slug %}">{{ dance.name }}</a>{% if dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a></small>{% endif %}</h3>
+  {% for dance in scheduled_dances %}
+    <h3><a href="{% url 'stepping_out_scheduled_dance_detail' slug=dance.slug %}">{{ dance.name }}</a>{% if dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a></small>{% endif %}</h3>
+    <div class="row">
+      <div class="span6">
         <h4>
-            {% with weeks=dance.get_weeks %}
-                {% if weeks|length == 5 %}
-                    Every {{ dance.get_weekday_display }}
-                {% else %}
-                    {% filter capfirst %}{% for week in weeks %}{% if forloop.last and not forloop.first %} and {% endif %}{{ week|lower }}{% if weeks|length > 2 and not forloop.last %}, {% endif %}{% endfor %}
-                    {% endfilter %}
-                    {{ dance.get_weekday_display }}{{ weeks|pluralize }}
-                {% endif %}
-            {% endwith %}
-            {% if dance.start and dance.end %}
-                from <time datetime="{{ dance.start|date:'H:i' }}">{{ dance.start|date:'g:i a' }}</time> to <time datetime="{{ dance.end|date:'H:i' }}">{{ dance.end|date:'g:i a' }}</time>
+          {% with weeks=dance.get_weeks %}
+            {% if weeks|length == 5 %}
+              Every {{ dance.get_weekday_display }}{% else %}
+              {% filter capfirst %}{% for week in weeks %}{% if forloop.last and not forloop.first %} and {% endif %}{{ week|lower }}{% if weeks|length > 2 and not forloop.last %}, {% endif %}{% endfor %}
+              {% endfilter %}
+              {{ dance.get_weekday_display }}{{ weeks|pluralize }}{% endif %}{% if dance.start and dance.end %},
+              <time datetime="{{ dance.start|date:'H:i' }}">{{ dance.start|date:'g:i a' }}</time> – <time datetime="{{ dance.end|date:'H:i' }}">{{ dance.end|date:'g:i a' }}</time>
             {% endif %}
+          {% endwith %}
         </h4>
+        {% with lessons=dance.scheduled_lessons.all %}
+          {% if lessons %}
+            {% for lesson in lessons %}
+              <h4>{{ lesson.name }}{% if lesson.start and lesson.end %}, <time datetime="{{ lesson.start|date:'H:i' }}">{{ lesson.start|date:'g:i a' }}</time> – <time datetime="{{ lesson.end|date:'H:i' }}">{{ lesson.end|date:'g:i a' }}</time>{% endif %}</h4>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+      <div class="span6">
         {% if dance.venue %}
-            {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+          {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
         {% endif %}
-    {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
 {% endblock %}

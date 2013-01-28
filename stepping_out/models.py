@@ -129,6 +129,7 @@ class Lesson(BasePriceModel):
                                          related_name='lessons')
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
+    dance_included = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('slug', 'dance')
@@ -195,6 +196,7 @@ class ScheduledLesson(BasePriceModel):
     venue = models.ForeignKey(Venue, blank=True, null=True)
     start = models.TimeField(blank=True, null=True)
     end = models.TimeField(blank=True, null=True)
+    dance_included = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('slug', 'scheduled_dance')
