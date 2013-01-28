@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'stepping_out',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging

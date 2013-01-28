@@ -1,10 +1,12 @@
 {% extends "stepping_out/__base.html" %}
 
+{% load url from future %}
+
 {% block main %}
     {% for dance in scheduled_dances %}
-        <h3>{% if dance.website %}<a href="{{ dance.website }}">{% endif %}{{ dance.name }}{% if dance.website %} <i class="icon-external-link"></i></a>{% endif %} <small>{% if dance.venue %}at {% if dance.venue.website %}<a href="{{ dance.venue.website }}">{% endif %}{{ dance.venue.name }}{% if dance.venue.website %} <i class="icon-external-link"></i></a>{% endif %}{% endif %}</small></h3>
-        {% with weeks=dance.get_weeks %}
-            <h4>
+        <h3><a href="{% url 'stepping_out_scheduled_dance_detail' slug=dance.slug %}">{{ dance.name }}</a>{% if dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a></small>{% endif %}</h3>
+        <h4>
+            {% with weeks=dance.get_weeks %}
                 {% if weeks|length == 5 %}
                     Every {{ dance.get_weekday_display }}
                 {% else %}
@@ -12,8 +14,11 @@
                     {% endfilter %}
                     {{ dance.get_weekday_display }}{{ weeks|pluralize }}
                 {% endif %}
-            </h4>
-        {% endwith %}
+            {% endwith %}
+            {% if dance.start and dance.end %}
+                from <time datetime="{{ dance.start|date:'H:i' }}">{{ dance.start|date:'g:i a' }}</time> to <time datetime="{{ dance.end|date:'H:i' }}">{{ dance.end|date:'g:i a' }}</time>
+            {% endif %}
+        </h4>
         {% if dance.venue %}
             {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
         {% endif %}

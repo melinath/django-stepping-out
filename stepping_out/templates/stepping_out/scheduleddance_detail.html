@@ -1,0 +1,24 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load url from future %}
+
+{% block main %}
+{% with dance=scheduled_dance %}
+    <h3>{{ dance.name }}{% if dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a></small>{% endif %}</h3>
+    {% if dance.website %}<h4>{{ dance.website|urlize }}</h4>{% endif %}
+    {% with weeks=dance.get_weeks %}
+        <h4>
+            {% if weeks|length == 5 %}
+                Every {{ dance.get_weekday_display }}
+            {% else %}
+                {% filter capfirst %}{% for week in weeks %}{% if forloop.last and not forloop.first %} and {% endif %}{{ week|lower }}{% if weeks|length > 2 and not forloop.last %}, {% endif %}{% endfor %}
+                {% endfilter %}
+                {{ dance.get_weekday_display }}{{ weeks|pluralize }}
+            {% endif %}
+        </h4>
+    {% endwith %}
+    {% if dance.venue %}
+        {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+    {% endif %}
+{% endwith %}
+{% endblock %}

@@ -8,7 +8,7 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    url(r'^$', include('stepping_out.urls')),
+    url(r'^', include('stepping_out.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^grappelli/', include('grappelli.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

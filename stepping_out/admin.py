@@ -8,16 +8,17 @@ class ScheduledLessonInline(admin.StackedInline):
     model = ScheduledLesson
     fieldsets = (
         (None, {
-            'fields': ('name', 'description'),
+            'fields': ('name', 'slug', 'description'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'scheduled_dance'),
         }),
         ('Pricing', {
-            'fields': ('price', 'student_price')
+            'fields': ('price', 'student_price', 'custom_price')
         })
     )
     extra = 1
+    prepopulated_fields = {"slug": ("name",)}
 
 
 class ScheduledDanceAdmin(admin.ModelAdmin):
@@ -25,21 +26,23 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
-            'fields': ('name', 'description', 'website'),
+            'fields': ('name', 'slug', 'description', 'website'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'weekday', 'weeks'),
         }),
         ('Pricing', {
-            'fields': ('price', 'student_price')
+            'fields': ('price', 'student_price', 'custom_price')
         })
     )
     inlines = [ScheduledLessonInline]
+    prepopulated_fields = {"slug": ("name",)}
 
 
 class VenueAdmin(admin.ModelAdmin):
     model = Venue
     form = VenueForm
+    prepopulated_fields = {"slug": ("name",)}
 
 
 admin.site.register(ScheduledDance, ScheduledDanceAdmin)
