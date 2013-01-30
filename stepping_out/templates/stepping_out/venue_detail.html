@@ -5,7 +5,7 @@
 {% block main %}
     <h3>{{ venue.name }}</h3>
     {% if venue.website %}<h4>{{ venue.website|urlize }}</h4>{% endif %}
-    {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+    {% include "stepping_out/_venue_map.html" %}
 
     <h4>Dances</h4>
     {% for dance in venue.scheduled_dances.all %}
