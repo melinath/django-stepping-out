@@ -7,8 +7,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 
-urlpatterns = patterns('',
-    url(r'^', include('stepping_out.urls')),
+urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^grappelli/', include('grappelli.urls')),
-) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    url(r'^', include('stepping_out.urls')),
+)

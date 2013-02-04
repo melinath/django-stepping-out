@@ -115,7 +115,7 @@ class Dance(BasePriceModel):
     end = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
-        return self.name
+        return "{0} ({1})".format(self.name, self.start.strftime("%Y-%m-%d"))
 
 
 class Lesson(BasePriceModel):

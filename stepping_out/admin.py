@@ -1,4 +1,6 @@
-from django.contrib import admin
+from django.core.urlresolvers import reverse
+from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
 
 from stepping_out.forms import ScheduledDanceForm, VenueForm
 from stepping_out.models import (ScheduledLesson, ScheduledDance,
@@ -38,6 +40,23 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     )
     inlines = [ScheduledLessonInline]
     prepopulated_fields = {"slug": ("name",)}
+    actions = ['create_next_dances']
+
+    def create_next_dances(self, request, queryset):
+        for scheduled_dance in queryset:
+            dance, created = scheduled_dance.get_or_create_next_dance()
+            url = reverse('admin:stepping_out_dance_change', args=(dance.pk,))
+            if created:
+                message = u"Created {0}".format(dance)
+                level = messages.success
+            else:
+                message = u"{0} already exists".format(dance)
+                level = messages.info
+            if len(queryset) > 1:
+                message = u"{0}: {1}".format(message, url)
+            level(request, message)
+        if len(queryset) == 1:
+            return HttpResponseRedirect(url)
 
 
 class VenueAdmin(admin.ModelAdmin):
