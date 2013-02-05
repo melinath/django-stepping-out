@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import ListView, DetailView
 
 from stepping_out.models import ScheduledDance, Venue
+from stepping_out.views import ScheduledDanceDetailView
 
 
 urlpatterns = patterns('',
@@ -11,8 +12,7 @@ urlpatterns = patterns('',
                          context_object_name='scheduled_dances'),
         name='stepping_out_index'),
     url(r'^(?P<slug>[\w-]+)/$',
-        DetailView.as_view(model=ScheduledDance,
-                           context_object_name='scheduled_dance'),
+        ScheduledDanceDetailView.as_view(),
         name='stepping_out_scheduled_dance_detail'),
     url(r'^venues/(?P<slug>[\w-]+)/$',
         DetailView.as_view(model=Venue,

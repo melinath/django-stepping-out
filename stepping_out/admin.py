@@ -4,7 +4,8 @@ from django.http import HttpResponseRedirect
 
 from stepping_out.forms import ScheduledDanceForm, VenueForm
 from stepping_out.models import (ScheduledLesson, ScheduledDance,
-                                 Venue, Dance, Lesson, Person)
+                                 Venue, Dance, Lesson, Person, DanceDJ,
+                                 DanceLiveAct)
 
 
 class ScheduledLessonInline(admin.StackedInline):
@@ -84,6 +85,12 @@ class LessonInline(admin.StackedInline):
     filter_horizontal = ('teachers',)
 
 
+class DanceDJInline(admin.TabularInline):
+    model = DanceDJ
+    extra = 1
+    sortable_field_name = "order"
+
+
 class DanceAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -97,7 +104,7 @@ class DanceAdmin(admin.ModelAdmin):
             'fields': ('price', 'student_price', 'custom_price')
         })
     )
-    inlines = [LessonInline]
+    inlines = [LessonInline, DanceDJInline]
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ('hosts',)
 

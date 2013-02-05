@@ -26,11 +26,11 @@
           {% endif %}
         {% endwith %}
       </div>
-      <div class="span6">
-        {% if dance.venue %}
+      {% if dance.venue %}
+        <div class="span6">
           {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
-        {% endif %}
-      </div>
+        </div>
+      {% endif %}
     </div>
   {% endfor %}
 {% endblock %}

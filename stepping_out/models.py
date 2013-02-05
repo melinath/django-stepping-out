@@ -115,7 +115,7 @@ class Dance(BasePriceModel):
     end = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
-        return "{0} ({1})".format(self.name, self.start.strftime("%Y-%m-%d"))
+        return u"{0} ({1})".format(self.name, self.start.strftime("%Y-%m-%d"))
 
 
 class Lesson(BasePriceModel):
@@ -128,7 +128,7 @@ class Lesson(BasePriceModel):
     description = models.TextField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
     teachers = models.ManyToManyField(Person, blank=True)
-    dance = models.ForeignKey(Dance)
+    dance = models.ForeignKey(Dance, related_name='lessons')
     scheduled_lesson = models.ForeignKey('ScheduledLesson',
                                          blank=True,
                                          null=True,
@@ -141,7 +141,8 @@ class Lesson(BasePriceModel):
         unique_together = ('slug', 'dance')
 
     def __unicode__(self):
-        return self.name
+        return u"{0} ({1}, {2})".format(self.name, self.dance.name,
+                                        self.start.strftime("%Y-%m-%d"))
 
 
 class ScheduledDance(BasePriceModel):

@@ -117,6 +117,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'stepping_out',
     'south',
+    'daguerre',
 )
 
 # A sample logging configuration. The only tangible logging

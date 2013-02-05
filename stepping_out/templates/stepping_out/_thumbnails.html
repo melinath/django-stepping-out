@@ -1,0 +1,16 @@
+{# expects objects (with .image and .name attributes) and (optionally) width. #}
+{% load daguerre %}
+{% if objects %}
+  <div class="row-fluid">
+    <ul class='thumbnails'>
+      {% for object in objects %}
+        <li class="span{{ width|default:4 }}">
+          <div class="thumbnail">
+            {% if object.image %}<img src="{% adjust object.image width=300 height=200 adjustment='fill' %}" />{% endif %}
+            <h5>{{ object.name }}</h5>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
