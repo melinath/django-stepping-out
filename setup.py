@@ -30,5 +30,6 @@ setup(
         'django>=1.4',
         'Pillow>=1.1.7',
         'pygeocoder>=1.1.4',
+        'Markdown>=2.2.1',
     ]
 )

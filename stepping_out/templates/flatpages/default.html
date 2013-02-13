@@ -1,0 +1,9 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load markup %}
+
+{% block title %}{{ flatpage.title }} — {{ block.super }}{% endblock %}
+
+{% block main %}
+    {{ flatpage.content|markdown }}
+{% endblock %}

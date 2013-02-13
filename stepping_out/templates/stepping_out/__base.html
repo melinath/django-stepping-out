@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles flatpages %}{% load url from future %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -15,7 +15,11 @@
                     <div class="nav-inner">
                         <a class="brand" href="/">Stepping Out</a>
                         <ul class="nav nav">
-                            <li class="active"><a href="/">Home</a></li>
+                            <li{% if request.path == '/' %} class="active"{% endif %}><a href="/">Home</a></li>
+                            {% get_flatpages as flatpages %}
+                            {% for page in flatpages %}
+                                <li{% if request.path == page.url %} class="active"{% endif %}><a href="{{ page.url }}">{{ page.title }}</a></li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </nav>
