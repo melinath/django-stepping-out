@@ -1,0 +1,90 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load url from future %}
+{% load tz %}
+
+{% block main %}
+  <h1>This week's dances</h1>
+  {% for day, dances in dances_grouped.iteritems %}
+    <h2>{{ day|date:"l" }} <small>{{ day|date:"F jS" }}</small></h2>
+
+    {% for dance in dances %}
+      <h3>{{ dance.name }}
+        {% if dance.venue or dance.scheduled_dance.website %}
+          <small>
+            {% if dance.venue %}at <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>{% endif %}
+            {% if dance.scheduled_dance.website %}({{ dance.scheduled_dance.website|urlize }}){% endif %}
+          </small>
+        {% endif %}
+      </h3>
+      <div class="row">
+        <div class="span6">
+          <div class="accordion" id="{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+            {% with lessons=dance.lessons.all %}
+              {% for lesson in lessons %}
+                <div class="accordion-group">
+                  <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-target="#{{ forloop.parentloop.parentloop.counter }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" data-parent="#{{ forloop.parentloop.parentloop.counter }}-{{ forloop.parentloop.counter }}">
+                      {{ lesson.name }}{% if lesson.start and lesson.end %}, <time datetime="{{ lesson.start|date:'H:i' }}">{{ lesson.start|date:'g:i a' }}</time> – <time datetime="{{ lesson.end|date:'H:i' }}">{{ lesson.end|date:'g:i a' }}</time>{% endif %}
+                    </a>
+                  </div>
+                  <div class="accordion-body collapse" id="{{ forloop.parentloop.parentloop.counter }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                    <div class="accordion-inner">
+                      {% if lesson.description %}
+                        <p>
+                          {{ lesson.description }}
+                        </p>
+                      {% endif %}
+                      {% include "stepping_out/_thumbnails.html" with objects=lesson.teachers.all only %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% endwith %}
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-target="#{{ forloop.parentloop.counter }}-{{ forloop.counter }}-dance" data-parent="#{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                  Dancing{% if dance.start and dance.end %}, <time datetime="{{ dance.start|date:'H:i' }}">{{ dance.start|date:'g:i a' }}</time> – <time datetime="{{ dance.end|date:'H:i' }}">{{ dance.end|date:'g:i a' }}</time>{% endif %}
+                </a>
+              </div>
+              <div class="accordion-body collapse" id="{{ forloop.parentloop.counter }}-{{ forloop.counter }}-dance">
+                <div class="accordion-inner">
+                  {% with hosts=dance.hosts.all %}
+                    {% if hosts %}
+                      <h3>Hosts</h3>
+                      {% include "stepping_out/_thumbnails.html" with objects=hosts only %}
+                    {% endif %}
+                  {% endwith %}
+                  {% with djs=dance.djs.all %}
+                    {% if djs %}
+                      <h3>DJs</h3>
+                      {% include "stepping_out/_thumbnails.html" with objects=djs only %}
+                    {% endif %}
+                  {% endwith %}
+                  {% with live_acts=dance.live_acts.all %}
+                    {% if live_acts %}
+                      <h3>Live Acts</h3>
+                      {% include "stepping_out/_thumbnails.html" with objects=live_acts only %}
+                    {% endif %}
+                  {% endwith %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="span6">
+          {% if dance.venue %}
+            {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+          {% endif %}
+          {% with lessons=dance.scheduled_lessons.all %}
+            {% if lessons %}
+              {% for lesson in lessons %}
+                <h4>{{ lesson.name }}{% if lesson.start and lesson.end %}, <time datetime="{{ lesson.start|date:'H:i' }}">{{ lesson.start|date:'g:i a' }}</time> – <time datetime="{{ lesson.end|date:'H:i' }}">{{ lesson.end|date:'g:i a' }}</time>{% endif %}</h4>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+{% endblock %}

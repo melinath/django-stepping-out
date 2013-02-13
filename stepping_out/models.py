@@ -115,7 +115,8 @@ class Dance(BasePriceModel):
     end = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
-        return u"{0} ({1})".format(self.name, self.start.strftime("%Y-%m-%d"))
+        start = self.start.astimezone(get_current_timezone())
+        return u"{0} ({1})".format(self.name, start.strftime("%Y-%m-%d"))
 
 
 class Lesson(BasePriceModel):
@@ -141,8 +142,9 @@ class Lesson(BasePriceModel):
         unique_together = ('slug', 'dance')
 
     def __unicode__(self):
+        start = self.start.astimezone(get_current_timezone())
         return u"{0} ({1}, {2})".format(self.name, self.dance.name,
-                                        self.start.strftime("%Y-%m-%d"))
+                                        start.strftime("%Y-%m-%d"))
 
 
 class ScheduledDance(BasePriceModel):
@@ -189,10 +191,37 @@ class ScheduledDance(BasePriceModel):
         return [week[1] for week in self.WEEK_CHOICES
                 if unicode(week[0]) in self.weeks]
 
+    def days_in_month(self, month):
+        # month is an integer, 1-12.
+        days = []
+        month_start = datetime.date(datetime.datetime.today().year, month, 1)
+        until_first = (7 - month_start.weekday() + self.weekday) % 7
+
+        first_day = month_start + datetime.timedelta(until_first)
+
+        for week in self.WEEK_CHOICES:
+            if unicode(week[0]) in self.weeks:
+                days.append(first_day + datetime.timedelta(7 * (week[0] - 1)))
+
+        return days
+
+    def get_next_date(self):
+        now = datetime.datetime.now()
+        today = now.date()
+        time = now.time()
+
+        for month in [now.month, now.month + 1]:
+            days = self.days_in_month(month)
+            for day in days:
+                if day > today:
+                    return day
+                if day == today and self.start > time:
+                    return day
+
+        raise ValueError("No next date found.")
+
     def get_or_create_next_dance(self):
-        today = datetime.date.today()
-        days = (7 - today.weekday() + self.weekday) % 7
-        start_day = today + datetime.timedelta(days)
+        start_day = self.get_next_date()
         tzinfo = get_current_timezone()
         start = datetime.datetime.combine(start_day, self.start
                                 ).replace(tzinfo=tzinfo)
@@ -243,13 +272,39 @@ class ScheduledLesson(BasePriceModel):
     end = models.TimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
 
+    def days_in_month(self, month):
+        # month is an integer, 1-12.
+        days = []
+        month_start = datetime.date(datetime.datetime.today().year, month, 1)
+        until_first = (7 - month_start.weekday() + self.weekday) % 7
+
+        first_day = month_start + datetime.timedelta(until_first)
+
+        for week in self.WEEK_CHOICES:
+            if unicode(week[0]) in self.weeks:
+                days.append(first_day + datetime.timedelta(7 * (week[0] - 1)))
+
+        return days
+
+    def get_next_date(self):
+        now = datetime.datetime.now()
+        today = now.date()
+        time = now.time()
+
+        for month in [now.month, now.month + 1]:
+            days = self.days_in_month(month)
+            for day in days:
+                if day > today:
+                    return day
+                if day == today and self.start > time:
+                    return day
+
+        raise ValueError("No next date found.")
+
     def get_or_create_next_lesson(self, dance):
         if dance.scheduled_dance != self.scheduled_dance:
             raise ValueError
-        scheduled_dance = self.scheduled_dance
-        today = datetime.date.today()
-        days = (7 - today.weekday() + scheduled_dance.weekday) % 7
-        start_day = today + datetime.timedelta(days)
+        start_day = self.scheduled_dance.get_next_date()
         tzinfo = get_current_timezone()
         start = datetime.datetime.combine(start_day, self.start
                                 ).replace(tzinfo=tzinfo)
