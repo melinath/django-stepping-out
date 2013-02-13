@@ -20,7 +20,7 @@ class DanceListView(ListView):
         end = start + datetime.timedelta(7)
         start = start + datetime.timedelta(hours=.5)
         return Dance.objects.filter(end__gt=start, start__lt=end
-                           ).select_related('venue'
+                           ).select_related('venue', 'scheduled_dance',
                            ).order_by('start')
 
     def get_context_data(self, **kwargs):

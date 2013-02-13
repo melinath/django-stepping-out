@@ -15,6 +15,9 @@ urlpatterns = patterns('',
                          template_name='stepping_out/index.html',
                          context_object_name='scheduled_dances'),
         name='stepping_out_scheduled_dances'),
+    url(r'^scheduled-dances/(?P<slug>[\w-]+)/$',
+        ScheduledDanceDetailView.as_view(),
+        name='stepping_out_scheduled_dance_detail'),
 
     url(r'^venues/$',
         ListView.as_view(queryset=Venue.objects.order_by('name'),
@@ -25,8 +28,4 @@ urlpatterns = patterns('',
         DetailView.as_view(model=Venue,
                            context_object_name='venue'),
         name='stepping_out_venue_detail'),
-
-    url(r'^(?P<slug>[\w-]+)/$',
-        ScheduledDanceDetailView.as_view(),
-        name='stepping_out_scheduled_dance_detail'),
 )
