@@ -1,7 +1,6 @@
 {% extends "stepping_out/__base.html" %}
 
 {% load url from future %}
-{% load tz markup %}
 
 {% block main %}
   <h1>This week's dances</h1>
@@ -25,41 +24,67 @@
               </p>
 
               {% with lessons=dance.lessons.all %}
-                <ul class="nav nav-pills">
+                <ul class="nav nav-tabs">
                   {% for lesson in lessons %}
                     <li><a href="#{{ dance.pk }}-{{ lesson.pk }}" data-toggle="pill">{{ lesson.name }}</a></li>
                   {% endfor %}
-                  <li><a href="#{{ dance.pk }}" data-toggle="pill">Dance</a></li>
+                  <li class='active'><a href="#{{ dance.pk }}" data-toggle="pill">Dance</a></li>
                 </ul>
 
                 <div class='tab-content'>
                   {% for lesson in lessons %}
                     <div class='tab-pane' id="{{ dance.pk }}-{{ lesson.pk }}">
-                      {% if lesson.start and lesson.end %}<time datetime="{{ lesson.start|date:'H:i' }}">{{ lesson.start|date:'g:i a' }}</time> – <time datetime="{{ lesson.end|date:'H:i' }}">{{ lesson.end|date:'g:i a' }}</time>{% endif %}
-                      {% if lesson.description %}
-                        {{ lesson.description|markdown }}
-                      {% endif %}
-                      {% include "stepping_out/_thumbnails.html" with objects=lesson.teachers.all only %}
+                      {% include "stepping_out/_time_price_description.html" with object=lesson only %}
+                      {% with teachers=lesson.teachers.all %}
+                        {% if teachers %}
+                          <div class='row'>
+                            <div class='span1'>
+                              <p><strong>Teachers</strong></p>
+                            </div>
+                            <div class='span4'>
+                              {% include "stepping_out/_people.html" with people=teachers only %}
+                            </div>
+                          </div>
+                        {% endif %}
+                      {% endwith %}
                     </div>
                   {% endfor %}
-                  <div class='tab-pane' id="{{ dance.pk }}">
-                    {% if dance.start and dance.end %}<time datetime="{{ dance.start|date:'H:i' }}">{{ dance.start|date:'g:i a' }}</time> – <time datetime="{{ dance.end|date:'H:i' }}">{{ dance.end|date:'g:i a' }}</time>{% endif %}
+                  <div class='tab-pane active' id="{{ dance.pk }}">
+                    {% include "stepping_out/_time_price_description.html" with object=dance only %}
                     {% with hosts=dance.hosts.all %}
                       {% if hosts %}
-                        <h3>Hosts</h3>
-                        {% include "stepping_out/_thumbnails.html" with objects=hosts only %}
+                        <div class='row'>
+                          <div class='span1'>
+                            <p><strong>Hosts</strong></p>
+                          </div>
+                          <div class='span4'>
+                            {% include "stepping_out/_people.html" with people=hosts only %}
+                          </div>
+                        </div>
                       {% endif %}
                     {% endwith %}
                     {% with djs=dance.djs.all %}
                       {% if djs %}
-                        <h3>DJs</h3>
-                        {% include "stepping_out/_thumbnails.html" with objects=djs only %}
+                        <div class='row'>
+                          <div class='span1'>
+                            <p><strong>DJs</strong></p>
+                          </div>
+                          <div class='span4'>
+                            {% include "stepping_out/_people.html" with people=djs only %}
+                          </div>
+                        </div>
                       {% endif %}
                     {% endwith %}
                     {% with live_acts=dance.live_acts.all %}
                       {% if live_acts %}
-                        <h3>Live Acts</h3>
-                        {% include "stepping_out/_thumbnails.html" with objects=live_acts only %}
+                        <div class='row'>
+                          <div class='span1'>
+                            <p><strong>Live Acts</strong></p>
+                          </div>
+                          <div class='span4'>
+                            {% include "stepping_out/_people.html" with people=live_acts only %}
+                          </div>
+                        </div>
                       {% endif %}
                     {% endwith %}
                   </div>

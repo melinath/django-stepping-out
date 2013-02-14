@@ -140,6 +140,7 @@ class Lesson(BasePriceModel):
 
     class Meta:
         unique_together = ('slug', 'dance')
+        ordering = ('start', 'end')
 
     def __unicode__(self):
         start = self.start.astimezone(get_current_timezone())

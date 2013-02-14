@@ -24,7 +24,7 @@
                       {{ lesson.description }}
                     </p>
                   {% endif %}
-                  {% include "stepping_out/_thumbnails.html" with objects=lesson.teachers.all only %}
+                  {% include "stepping_out/_people.html" with people=lesson.teachers.all only %}
                 </div>
               </div>
             </div>
@@ -41,19 +41,19 @@
               {% with hosts=next_dance.hosts.all %}
                 {% if hosts %}
                   <h3>Hosts</h3>
-                  {% include "stepping_out/_thumbnails.html" with objects=hosts only %}
+                  {% include "stepping_out/_people.html" with people=hosts only %}
                 {% endif %}
               {% endwith %}
               {% with djs=next_dance.djs.all %}
                 {% if djs %}
                   <h3>DJs</h3>
-                  {% include "stepping_out/_thumbnails.html" with objects=djs only %}
+                  {% include "stepping_out/_people.html" with people=djs only %}
                 {% endif %}
               {% endwith %}
               {% with live_acts=next_dance.live_acts.all %}
                 {% if live_acts %}
                   <h3>Live Acts</h3>
-                  {% include "stepping_out/_thumbnails.html" with objects=live_acts only %}
+                  {% include "stepping_out/_people.html" with people=live_acts only %}
                 {% endif %}
               {% endwith %}
             </div>

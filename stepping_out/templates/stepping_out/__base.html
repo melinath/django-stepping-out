@@ -29,7 +29,8 @@
         </div>
         {% block js_foot %}
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-            <script src="{% static 'stepping_out/js/bootstrap.min.js' %}"></script>
+            <script src="{% static 'stepping_out/js/bootstrap.js' %}"></script>
+            <script src="{% static 'stepping_out/js/stepping_out.kickoff.js' %}"></script>
             {% if "MSIE 6" in request.META.HTTP_USER_AGENT or "MSIE 7" in request.META.HTTP_USER_AGENT %}
                 {% if not "chromeframe" in request.META.HTTP_USER_AGENT %}
                     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.2/CFInstall.min.js"></script>

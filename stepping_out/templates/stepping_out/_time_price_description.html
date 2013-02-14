@@ -1,0 +1,43 @@
+{# expects an object with start/end and price fields. #}
+{% load markup %}
+{% if object.start %}
+  <div class='row'>
+    <div class='span1'>
+      <p><strong>Time</strong></p>
+    </div>
+    <div class='span4'>
+      <time datetime="{{ object.start|date:'H:i' }}">{{ object.start|date:'g:i a' }}</time> –
+      {% if object.end %}
+        <time datetime="{{ object.end|date:'H:i' }}">{{ object.end|date:'g:i a' }}</time>
+      {% else %}
+        ???
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+{% if object.price or object.student_price or object.custom_price %}
+  <div class='row'>
+    <div class='span1'>
+      <p><strong>Price</strong></p>
+    </div>
+    <div class='span4'>
+      {% if object.price %}
+        ${{ object.price }}{% if object.student_price or object.custom_price %},{% endif %}
+      {% endif %}
+      {% if object.student_price %}
+        ${{ object.student_price }} for students{% if object.custom_price %},{% endif %}
+      {% endif %}
+      {{ object.custom_price }}
+    </div>
+  </div>
+{% endif %}
+{% if object.description %}
+  <div class='row'>
+    <div class='span1'>
+      <p><strong>Description</strong></p>
+    </div>
+    <div class='span4'>
+      {{ object.description|markdown }}
+    </div>
+  </div>
+{% endif %}
