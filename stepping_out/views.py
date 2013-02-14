@@ -15,13 +15,11 @@ class DanceListView(ListView):
         for sd in ScheduledDance.objects.all():
             sd.get_or_create_next_dance()
 
-        tzinfo = get_current_timezone()
-        start = datetime.datetime.now().replace(tzinfo=tzinfo).astimezone(utc)
+        start = datetime.datetime.now(get_current_timezone()).astimezone(utc)
         end = start + datetime.timedelta(7)
         start = start + datetime.timedelta(hours=.5)
         return Dance.objects.filter(end__gt=start, start__lt=end
-                           ).select_related('venue', 'scheduled_dance',
-                           ).order_by('start')
+                           ).select_related('venue', 'scheduled_dance')
 
     def get_context_data(self, **kwargs):
         context = super(DanceListView, self).get_context_data(**kwargs)
