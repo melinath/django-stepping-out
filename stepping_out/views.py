@@ -18,7 +18,7 @@ class DanceListView(ListView):
         start = datetime.datetime.now(get_current_timezone()).astimezone(utc)
         end = start + datetime.timedelta(7)
         start = start + datetime.timedelta(hours=.5)
-        return Dance.objects.filter(end__gt=start, start__lt=end
+        return Dance.objects.filter(end__gt=start, start__lt=end, is_canceled=False
                            ).select_related('venue', 'scheduled_dance')
 
     def get_context_data(self, **kwargs):

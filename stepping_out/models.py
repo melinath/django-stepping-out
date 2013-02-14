@@ -113,6 +113,7 @@ class Dance(BasePriceModel):
                                         related_name='dances')
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
+    is_canceled = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('start', 'end')
