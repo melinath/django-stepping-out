@@ -1,0 +1,20 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load daguerre markup %}
+
+{% block main %}
+  <div class="row">
+    <div class="span3">
+      {% if person.image %}
+        <img class='img-polaroid' src="{% adjust person.image width=270 max_height=400 adjustment='fill' %}" />
+      {% endif %}
+    </div>
+    <div class="span9">
+      <h1>{{ person.name }}</h1>
+      {% if person.bio %}
+        <h2>Bio</h2>
+        {{ person.bio|markdown }}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

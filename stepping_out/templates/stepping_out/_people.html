@@ -3,8 +3,8 @@
 {% if people %}
   <ul class="unstyled">
     {% for person in people %}
-      {% adjust person.image width=208 height=128 adjustment="fill" as image%}
-      <li><a class='popover-trigger' href="#" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='right' data-container='body' data-content='{% filter escape %}<img src="{{ image }}" width={{ image.width }} height={{ image.height }} />{% endfilter %}' data-title="{{ person.name }}">{{ person.name }}</a></li>
+      {% adjust person.image width=208 height=128 adjustment="fill" as image %}
+      <li><a href="{{ person.get_absolute_url }}"{% if image %} class='popover-trigger' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='right' data-container='body' data-content='{% filter escape %}<img src="{{ image }}" width={{ image.width }} height={{ image.height }} />{% endfilter %}' data-title="{{ person.name }}"{% endif %}>{{ person.name }}</a></li>
     {% endfor %}
   </ul>
 {% endif %}

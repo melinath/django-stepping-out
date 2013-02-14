@@ -28,7 +28,6 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     bio = models.TextField(blank=True)
-    website = models.URLField(blank=True)
     user = models.OneToOneField('auth.User', blank=True, null=True)
     image = models.ImageField(upload_to='stepping_out/person/%Y/%m/%d',
                               blank=True)
@@ -39,17 +38,26 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_person_detail', (),
+                {'slug': self.slug})
+
 
 class LiveAct(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
-    website = models.URLField(blank=True)
-    image = models.ImageField(upload_to='stepping_out/live_music/%Y/%m/%d',
+    image = models.ImageField(upload_to='stepping_out/live_act/%Y/%m/%d',
                               blank=True)
 
     def __unicode__(self):
         return self.name
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_liveact_detail', (),
+                {'slug': self.slug})
 
 
 class BaseTimeOrderModel(models.Model):
@@ -64,16 +72,43 @@ class BaseTimeOrderModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('order', 'start', 'end',)
 
 
 class DanceDJ(BaseTimeOrderModel):
     person = models.ForeignKey(Person)
     dance = models.ForeignKey('Dance')
 
+    @property
+    def name(self):
+        return self.person.name
+
+    @property
+    def image(self):
+        return self.person.image
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_person_detail', (),
+                {'slug': self.person.slug})
+
 
 class DanceLiveAct(BaseTimeOrderModel):
-    live_music = models.ForeignKey(LiveAct)
+    live_act = models.ForeignKey(LiveAct)
     dance = models.ForeignKey('Dance')
+
+    @property
+    def name(self):
+        return self.live_act.name
+
+    @property
+    def image(self):
+        return self.live_act.image
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_liveact_detail', (),
+                {'slug': self.live_act.slug})
 
 
 class BasePriceModel(models.Model):
