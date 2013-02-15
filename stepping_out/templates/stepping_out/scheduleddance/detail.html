@@ -1,0 +1,40 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load url from future %}
+
+{% block main %}
+  <h1>{{ scheduled_dance.name }}{% if scheduled_dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=scheduled_dance.venue.slug %}">{{ scheduled_dance.venue.name }}</a>. {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance include_time=1 only %}</small>{% endif %}</h1>
+  <ul class='nav nav-tabs'>
+    <li class='active'><a href='#details' data-toggle="tab">Details</a></li>
+    <li><a href='#next-dance' data-toggle='tab'>Next dance{% if next_dance.is_canceled %} (canceled){% endif %}</a></li>
+  </ul>
+  <div class='tab-content'>
+    <div class='tab-pane' id='details'>
+      <div class="row">
+        <div class="span7">
+          {% if scheduled_dance.website %}<h4>{{ scheduled_dance.website|urlize }}</h4>{% endif %}
+          {% with lessons=scheduled_dance.scheduled_lessons.all %}
+            {% if lessons %}
+              {% for lesson in lessons %}
+                <h4>{{ lesson.name }}{% if lesson.start and lesson.end %}, <time datetime="{{ lesson.start|date:'H:i' }}">{{ lesson.start|date:'g:i a' }}</time> – <time datetime="{{ lesson.end|date:'H:i' }}">{{ lesson.end|date:'g:i a' }}</time>{% endif %}</h4>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+        <div class="span5">
+        {% if scheduled_dance.venue %}
+          {% include "stepping_out/_venue_map.html" with venue=scheduled_dance.venue only %}
+        {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class='tab-pane' id='next-dance'>
+      {% if next_dance.is_canceled %}
+        <p>The next dance would normally be on <time datetime="{{ next_dance.start|date:'c' }}">{{ next_dance.start|date:"F jS" }}</time>, but it's been canceled.</p>
+      {% else %}
+        <h3>{% if next_dance.name == scheduled_dance.name %}{{ next_dance.start|date:"F jS" }}{% else %}{{ next_dance.name }} ({{ next_dance.start|date:"F jS" }}){% endif %}</h3>
+        {% include "stepping_out/dance/_inner.html" with dance=next_dance only %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

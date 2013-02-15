@@ -20,10 +20,11 @@ urlpatterns = patterns('',
 
     url(r'^scheduled-dances/$',
         ListView.as_view(queryset=ScheduledDance.objects.order_by('name'),
+                         template_name='stepping_out/scheduleddance/list.html',
                          context_object_name='scheduled_dances'),
         name='stepping_out_scheduled_dances'),
     url(r'^scheduled-dances/(?P<slug>[\w-]+)/$',
-        ScheduledDanceDetailView.as_view(),
+        ScheduledDanceDetailView.as_view(template_name='stepping_out/scheduleddance/detail.html'),
         name='stepping_out_scheduled_dance_detail'),
 
     url(r'^venues/$',
