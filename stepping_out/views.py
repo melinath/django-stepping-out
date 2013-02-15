@@ -10,6 +10,7 @@ from stepping_out.models import ScheduledDance, Dance
 class DanceListView(ListView):
     model = Dance
     context_object_name = 'dances'
+    template_name = 'stepping_out/dance/list.html'
 
     def get_queryset(self):
         for sd in ScheduledDance.objects.all():

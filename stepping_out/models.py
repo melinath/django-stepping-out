@@ -198,6 +198,14 @@ class Dance(BasePriceModel):
         start = self.start.astimezone(get_current_timezone())
         return u"{0} ({1})".format(self.name, start.strftime("%Y-%m-%d"))
 
+    @models.permalink
+    def get_absolute_url(self):
+        tzinfo = get_current_timezone()
+        start = self.start.astimezone(tzinfo)
+        return ('stepping_out_dance_detail', (),
+                {'slug': self.slug, 'day': str(start.day).zfill(2),
+                 'month': str(start.month).zfill(2), 'year': str(start.year).zfill(4)})
+
 
 class Lesson(BasePriceModel):
     """

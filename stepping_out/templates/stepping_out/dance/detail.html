@@ -1,0 +1,21 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load url from future %}
+
+{% block main %}
+  <div class="row">
+    <div class="span7">
+      <h1>{{ dance.name }} <small>{{ dance.start|date:"F jS, Y" }}</small></h1>
+      {% include "stepping_out/dance/_inner.html" with dance=dance only %}
+    </div>
+    <div class="span5">
+      {% if dance.venue %}
+        {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+        <h4>
+          <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>
+        {% if dance.venue.website %}<small>({{ dance.venue.website|urlize }})</small>{% endif %}
+        </h4>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

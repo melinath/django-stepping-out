@@ -1,0 +1,35 @@
+{% extends "stepping_out/__base.html" %}
+
+{% load url from future %}
+
+{% block main %}
+  <h1>This week's dances</h1>
+  {% for day, dances in dances_grouped.iteritems %}
+    <div class="row">
+      <div class="span2">
+        <h2>{{ day|date:"l" }} <br /> <small>{{ day|date:"F jS" }}</small></h2>
+      </div>
+      <div class="span10">
+        {% for dance in dances %}
+          <h3>{{ dance.name }} <small><a class="btn-link" data-target=".{{ dance.pk }}-details" data-toggle="collapse">Details{% if dance.venue %}/Map{% endif %} <i class='icon-caret-down'></i></a></small></h3>
+          <div class="row">
+            <div class="span5 collapse {{ dance.pk }}-details">
+              {% include "stepping_out/dance/_inner.html" with dance=dance only %}
+            </div>
+            <div class="span5">
+              <div class="row collapse {{ dance.pk }}-details">
+                {% if dance.venue %}
+                  {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+                  <h4>
+                    <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>
+                  {% if dance.venue.website %}<small>({{ dance.venue.website|urlize }})</small>{% endif %}
+                  </h4>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}

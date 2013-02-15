@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, DateDetailView
 
-from stepping_out.models import ScheduledDance, Venue, Person, LiveAct
+from stepping_out.models import ScheduledDance, Venue, Person, LiveAct, Dance
 from stepping_out.views import ScheduledDanceDetailView, DanceListView
 
 
@@ -10,9 +10,16 @@ urlpatterns = patterns('',
         DanceListView.as_view(),
         name='stepping_out_dances'),
 
+    url(r'^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<slug>[\w-]+)/$',
+        DateDetailView.as_view(queryset=Dance.objects.select_related('venue', 'scheduled_dance'),
+                               template_name='stepping_out/dance/detail.html',
+                               date_field='start',
+                               allow_future=True,
+                               month_format='%m'),
+        name='stepping_out_dance_detail'),
+
     url(r'^scheduled-dances/$',
         ListView.as_view(queryset=ScheduledDance.objects.order_by('name'),
-                         template_name='stepping_out/index.html',
                          context_object_name='scheduled_dances'),
         name='stepping_out_scheduled_dances'),
     url(r'^scheduled-dances/(?P<slug>[\w-]+)/$',

@@ -20,7 +20,7 @@
         <h2>Recent Activity</h2>
         <ul>
           {% for dance, roles in activity %}
-            <li>{% filter capfirst %}{% for role in roles %}{% if forloop.last and not forloop.first %} and {% endif %}{{ role }}{% if not forloop.last and roles|length > 2 %}, {% endif %}{% endfor %}{% endfilter %} {{ dance.name }} on {{ dance.start|date:"F jS" }}</li>
+            <li>{% filter capfirst %}{% for role in roles %}{% if forloop.last and not forloop.first %} and {% endif %}{{ role }}{% if not forloop.last and roles|length > 2 %}, {% endif %}{% endfor %}{% endfilter %} <a href="{{ dance.get_absolute_url }}">{{ dance.name }}</a> on {{ dance.start|date:"F jS" }}</li>
           {% endfor %}
         </ul>
       {% endwith %}
