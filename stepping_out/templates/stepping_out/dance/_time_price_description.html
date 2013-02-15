@@ -6,9 +6,9 @@
       <p><strong>Time</strong></p>
     </div>
     <div class='span4'>
-      <time datetime="{{ object.start|date:'H:i' }}">{{ object.start|date:'g:i a' }}</time> –
+      <time datetime="{{ object.start|date:'c' }}">{{ object.start|date:'g:i a' }}</time> –
       {% if object.end %}
-        <time datetime="{{ object.end|date:'H:i' }}">{{ object.end|date:'g:i a' }}</time>
+        <time datetime="{{ object.end|date:'c' }}">{{ object.end|date:'g:i a' }}</time>
       {% else %}
         ???
       {% endif %}

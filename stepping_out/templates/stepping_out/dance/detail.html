@@ -5,7 +5,7 @@
 {% block main %}
   <div class="row">
     <div class="span7">
-      <h1>{{ dance.name }} <small>{{ dance.start|date:"F jS, Y" }}</small></h1>
+      <h1>{{ dance.name }} <small><time datetime="{{ dance.start|date:'c' }}">{{ dance.start|date:"F jS, Y" }}</time></small></h1>
       {% include "stepping_out/dance/_inner.html" with dance=dance only %}
     </div>
     <div class="span5">
