@@ -4,7 +4,9 @@
   <ul class="unstyled">
     {% for person in people %}
       {% adjust person.image width=208 height=128 adjustment="fill" as image %}
-      <li><a href="{{ person.get_absolute_url }}"{% if image %} class='popover-trigger' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='right' data-container='body' data-content='{% filter escape %}<img src="{{ image }}" width={{ image.width }} height={{ image.height }} />{% endfilter %}' data-title="{{ person.name }}"{% endif %}>{{ person.name }}</a></li>
+      {% with stats=person.get_recent_activity_stats %}
+        <li><a href="{{ person.get_absolute_url }}"{% if image or stats.hosted or stats.djed or stats.taught %} class='popover-trigger' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='right' data-container='body' data-content='{% filter escape %}{% if image %}<img src="{{ image }}" width={{ image.width }} height={{ image.height }} />{% endif %}{% if stats.hosted or stats.djed or stats.taught %}<h5>Recent activity</h5><ul>{% if stats.hosted %}<li>Hosted {{ stats.hosted }} dance{{ stats.hosted|pluralize }}</li>{% endif %}{% if stats.djed %}<li>DJed at {{ stats.djed }} dance{{ stats.djed|pluralize }}</li>{% endif %}{% if stats.taught %}<li>Taught {{ stats.taught }} lesson{{ stats.taught|pluralize }}</li>{% endif %}</ul>{% endif %}{% endfilter %}' data-title="{{ person.name }}"{% endif %}>{{ person.name }}</a></li>
+      {% endwith %}
     {% endfor %}
   </ul>
 {% endif %}

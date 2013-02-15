@@ -43,6 +43,47 @@ class Person(models.Model):
         return ('stepping_out_person_detail', (),
                 {'slug': self.slug})
 
+    def get_recent_activity(self):
+        """
+        Returns a list of the times this person has filled any role
+        at a dance in the last 60 days. Each item in the list is a tuple
+        of (dance, roles). The list is ordered by time.
+
+        """
+        activity = {}
+        now = datetime.datetime.now(utc)
+        start = now - datetime.timedelta(days=60)
+        dance_qs = Dance.objects.filter(start__gt=start, end__lt=now)
+        for dance in dance_qs.filter(hosts=self):
+            activity.setdefault(dance, []).append('hosted')
+
+        for dance in dance_qs.filter(djs=self):
+            activity.setdefault(dance, []).append('DJed at')
+
+        for lesson in Lesson.objects.filter(dance__in=dance_qs, teachers=self):
+            activity.setdefault(dance, []).append('taught {0} for'.format(lesson.name))
+
+        activity = list(activity.iteritems())
+        activity.sort(key=lambda item: item[0].end)
+        activity.sort(key=lambda item: item[0].start)
+
+        return activity
+
+    def get_recent_activity_stats(self):
+        """
+        Returns a dictionary of counts for the number of times this
+        person filled various roles in the last 60 days.
+
+        """
+        stats = {}
+        now = datetime.datetime.now(utc)
+        start = now - datetime.timedelta(days=60)
+        dance_qs = Dance.objects.filter(start__gt=start, end__lt=now)
+        stats['hosted'] = dance_qs.filter(hosts=self).count()
+        stats['djed'] = dance_qs.filter(djs=self).count()
+        stats['taught'] = Lesson.objects.filter(dance__in=dance_qs, teachers=self).count()
+        return stats
+
 
 class LiveAct(models.Model):
     name = models.CharField(max_length=100)

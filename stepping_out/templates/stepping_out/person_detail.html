@@ -1,6 +1,7 @@
 {% extends "stepping_out/__base.html" %}
 
 {% load daguerre markup %}
+{% load url from future %}
 
 {% block main %}
   <div class="row">
@@ -15,6 +16,14 @@
         <h2>Bio</h2>
         {{ person.bio|markdown }}
       {% endif %}
+      {% with activity=person.get_recent_activity %}
+        <h2>Recent Activity</h2>
+        <ul>
+          {% for dance, roles in activity %}
+            <li>{% filter capfirst %}{% for role in roles %}{% if forloop.last and not forloop.first %} and {% endif %}{{ role }}{% if not forloop.last and roles|length > 2 %}, {% endif %}{% endfor %}{% endfilter %} {{ dance.name }} on {{ dance.start|date:"F jS" }}</li>
+          {% endfor %}
+        </ul>
+      {% endwith %}
     </div>
   </div>
 {% endblock %}
