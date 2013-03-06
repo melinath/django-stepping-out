@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
+from django.template.loader import render_to_string
 
 from stepping_out.forms import ScheduledDanceForm, VenueForm
 from stepping_out.models import (ScheduledLesson, ScheduledDance,
@@ -42,6 +43,13 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     inlines = [ScheduledLessonInline]
     prepopulated_fields = {"slug": ("name",)}
     actions = ['create_next_dances']
+    list_display = ['name', 'venue', 'start', 'get_schedule']
+    list_filter = ['venue', 'weekday']
+
+    def get_schedule(self, obj):
+        return render_to_string('stepping_out/scheduleddance/_schedule.html',
+                                {'scheduled_dance': obj})
+    get_schedule.short_description = 'Schedule'
 
     def create_next_dances(self, request, queryset):
         for scheduled_dance in queryset:
@@ -63,6 +71,8 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
 class VenueAdmin(admin.ModelAdmin):
     form = VenueForm
     prepopulated_fields = {"slug": ("name",)}
+    list_display = ['name', 'address', 'city', 'state']
+    list_filter = ['state']
 
 
 class LessonInline(admin.StackedInline):
@@ -107,10 +117,16 @@ class DanceAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ('hosts',)
     readonly_fields = ['scheduled_dance']
+    list_display = ['name', 'start', 'venue', 'scheduled_dance']
+    list_filter = ['is_canceled', 'venue', 'scheduled_dance']
+    date_hierarchy = 'start'
+    ordering = ('-start',)
 
 
 class PersonAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
+    list_display = ['name']
+    ordering = ('name',)
 
 
 admin.site.register(ScheduledDance, ScheduledDanceAdmin)
