@@ -1,0 +1,9 @@
+{# expects start, optional end, and optional datetime_format. #}
+{% with datetime_format=datetime_format|default:'c' %}
+  <time datetime="{{ start|date:datetime_format }}">{{ start|date:'g:i a' }}</time> –
+  {% if end %}
+    <time datetime="{{ end|date:datetime_format }}">{{ end|date:'g:i a' }}</time>
+  {% else %}
+    ???
+  {% endif %}
+{% endwith %}

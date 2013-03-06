@@ -15,6 +15,14 @@
           <div class="row">
             <div class="span5 collapse {{ dance.pk }}-details">
               {% include "stepping_out/dance/_inner.html" with dance=dance only %}
+              <p>
+                {% if dance.scheduled_dance %}
+                  <a href="{% url 'stepping_out_scheduled_dance_detail' slug=dance.scheduled_dance.slug %}">{% if dance.name != dance.scheduled_dance.name %}{{ dance.scheduled_dance.name }}. {% endif %}{% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=dance.scheduled_dance only %}</a>
+                  {% if dance.scheduled_dance.website %}
+                    {% if dance.scheduled_dance.website %}{{ dance.scheduled_dance.website|urlize }}{% endif %}
+                  {% endif %}
+                {% endif %}
+              </p>
             </div>
             <div class="span5">
               <div class="row collapse {{ dance.pk }}-details">

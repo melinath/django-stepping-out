@@ -343,7 +343,7 @@ class ScheduledDance(BasePriceModel):
                                                      **kwargs)
         if created:
             for scheduled_lesson in self.scheduled_lessons.all():
-                scheduled_lesson.get_or_create_next_lesson(dance)
+                scheduled_lesson.get_or_create_lesson(dance)
         return dance, created
 
 

@@ -6,12 +6,7 @@
       <p><strong>Time</strong></p>
     </div>
     <div class='span4'>
-      <time datetime="{{ object.start|date:'c' }}">{{ object.start|date:'g:i a' }}</time> –
-      {% if object.end %}
-        <time datetime="{{ object.end|date:'c' }}">{{ object.end|date:'g:i a' }}</time>
-      {% else %}
-        ???
-      {% endif %}
+      {% include 'stepping_out/_times.html' with start=object.start end=object.end only %}
     </div>
   </div>
 {% endif %}
@@ -21,13 +16,7 @@
       <p><strong>Price</strong></p>
     </div>
     <div class='span4'>
-      {% if object.price %}
-        ${{ object.price }}{% if object.student_price or object.custom_price %},{% endif %}
-      {% endif %}
-      {% if object.student_price %}
-        ${{ object.student_price }} for students{% if object.custom_price %},{% endif %}
-      {% endif %}
-      {{ object.custom_price }}
+      {% include 'stepping_out/_prices.html' with object=object only %}
     </div>
   </div>
 {% endif %}

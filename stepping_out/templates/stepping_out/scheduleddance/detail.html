@@ -3,38 +3,51 @@
 {% load url from future %}
 
 {% block main %}
-  <h1>{{ scheduled_dance.name }}{% if scheduled_dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=scheduled_dance.venue.slug %}">{{ scheduled_dance.venue.name }}</a>. {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance include_time=1 only %}</small>{% endif %}</h1>
-  <ul class='nav nav-tabs'>
-    <li class='active'><a href='#details' data-toggle="tab">Details</a></li>
-    <li><a href='#next-dance' data-toggle='tab'>Next dance{% if next_dance.is_canceled %} (canceled){% endif %}</a></li>
-  </ul>
-  <div class='tab-content'>
-    <div class='tab-pane' id='details'>
-      <div class="row">
-        <div class="span7">
-          {% if scheduled_dance.website %}<h4>{{ scheduled_dance.website|urlize }}</h4>{% endif %}
-          {% with lessons=scheduled_dance.scheduled_lessons.all %}
-            {% if lessons %}
-              {% for lesson in lessons %}
-                <h4>{{ lesson.name }}{% if lesson.start and lesson.end %}, <time datetime="{{ lesson.start|date:'H:i' }}">{{ lesson.start|date:'g:i a' }}</time> – <time datetime="{{ lesson.end|date:'H:i' }}">{{ lesson.end|date:'g:i a' }}</time>{% endif %}</h4>
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
-        </div>
-        <div class="span5">
-        {% if scheduled_dance.venue %}
-          {% include "stepping_out/_venue_map.html" with venue=scheduled_dance.venue only %}
-        {% endif %}
-        </div>
-      </div>
-    </div>
-    <div class='tab-pane' id='next-dance'>
+  <div class="row">
+    <div class="span7">
+      <h1>{{ scheduled_dance.name }}{% if scheduled_dance.website %} <small>{{ scheduled_dance.website|urlize }}</small>{% endif %}</h1>
+
+      <h2>{{ next_dance.start|date:"F jS" }}{% if next_dance.name != scheduled_dance.name %} <small>{{ next_dance.name }}</small>{% endif %}</h2>
+
       {% if next_dance.is_canceled %}
-        <p>The next dance would normally be on <time datetime="{{ next_dance.start|date:'c' }}">{{ next_dance.start|date:"F jS" }}</time>, but it's been canceled.</p>
+        <div class='alert'>
+          <p>The next dance would normally be on <time datetime="{{ next_dance.start|date:'c' }}">{{ next_dance.start|date:"F jS" }}</time>, but it's been canceled.</p>
+        </div>
       {% else %}
-        <h3>{% if next_dance.name == scheduled_dance.name %}{{ next_dance.start|date:"F jS" }}{% else %}{{ next_dance.name }} ({{ next_dance.start|date:"F jS" }}){% endif %}</h3>
-        {% include "stepping_out/dance/_inner.html" with dance=next_dance only %}
+          {% include "stepping_out/dance/_inner.html" with dance=next_dance only %}
+          {% if next_dance.venue and next_dance.venue != scheduled_dance.venue %}
+            <h3>Special venue: <a href="{% url 'stepping_out_venue_detail' slug=next_dance.venue.slug %}">{{ next_dance.venue.name }}</a></h3>
+            {% include "stepping_out/_venue_map.html" with venue=next_dance.venue only %}
+          {% endif %}
       {% endif %}
+    </div>
+    <div class="span5">
+      <h1><small>About</small></h1>
+      <ul>
+        <li>{% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance only %}</li>
+        {% with lessons=scheduled_dance.scheduled_lessons.all %}
+          {% if lessons %}
+            {% for lesson in lessons %}
+              <li>
+                <a href="#about-lesson-{{ forloop.counter }}" data-toggle="collapse">{{ lesson.name }} <i class='icon-caret-down'></i></a>
+                <ul id="about-lesson-{{ forloop.counter }}" class='collapse'>
+                  {% if lesson.start %}<li>{% include 'stepping_out/_times.html' with start=lesson.start end=lesson.end datetime_format='H:i' only %}</li>{% endif %}
+                  <li>{% include 'stepping_out/_prices.html' %}</li>
+                </ul>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <li>Dance
+          <ul class='unstyled'>
+            {% if scheduled_dance.start %}<li>{% include 'stepping_out/_times.html' with start=scheduled_dance.start end=scheduled_dance.end datetime_format='H:i' only %}</li>{% endif %}
+            <li>{% include 'stepping_out/_prices.html' %}</li>
+          </ul>
+        {% if scheduled_dance.venue %}
+          <li>at <a href="{% url 'stepping_out_venue_detail' slug=scheduled_dance.venue.slug %}">{{ scheduled_dance.venue.name }}</a></li>
+          </li><a href="#map" data-toggle="collapse">Map <i class='icon-caret-down'></i></a></li>
+          <li class="collapse" id='map'>{% include "stepping_out/_venue_map.html" with venue=scheduled_dance.venue only %}</li>
+        {% endif %}
+      </ul>
     </div>
   </div>
 {% endblock %}
