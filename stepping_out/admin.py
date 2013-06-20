@@ -33,7 +33,7 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'description', 'website'),
+            'fields': ('name', 'slug', 'banner', 'description', 'website'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'weekday', 'weeks'),
