@@ -6,7 +6,7 @@
   <div class="row">
     <div class="span2">
       {% if live_act.image %}
-        <img class='img-polaroid' src="{% adjust live_act.image width=200 max_height=400 adjustment='fill' %}" />
+        <img class='img-polaroid' src="{% adjust live_act.image 'fill' width=200 max_height=400 %}" />
       {% endif %}
     </div>
     <div class="span10">

@@ -1,5 +1,7 @@
+from daguerre.widgets import AreaWidget
 from django.core.urlresolvers import reverse
 from django.contrib import admin, messages
+from django.db import models
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
@@ -124,6 +126,9 @@ class DanceAdmin(admin.ModelAdmin):
 
 
 class PersonAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ImageField: {'widget': AreaWidget},
+    }
     prepopulated_fields = {"slug": ("name",)}
     list_display = ['name']
     ordering = ('name',)

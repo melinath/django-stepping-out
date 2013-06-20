@@ -1,9 +1,9 @@
 import datetime
 
-from django.contrib.localflavor.us.models import USStateField
 from django.db import models
 from django.utils.timezone import get_current_timezone, utc
 from django.utils.translation import ugettext_lazy as _
+from django_localflavor_us.models import USStateField
 
 
 class Venue(models.Model):
