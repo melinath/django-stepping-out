@@ -131,6 +131,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
+    "stepping_out.context_processors.site",
 )
 
 # A sample logging configuration. The only tangible logging

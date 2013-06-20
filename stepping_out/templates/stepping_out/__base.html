@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>{% block title %}Stepping Out{% endblock %}</title>
+        <title>{% block title %}{{ site.name|default:"Stepping Out" }}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" media="screen" href="{% static 'stepping_out/css/screen.css' %}" />
     </head>
     <body>
@@ -13,7 +13,7 @@
             <header class="container">
                 <nav class="navbar">
                     <div class="nav-inner">
-                        <a class="brand" href="/">Stepping Out</a>
+                        <a class="brand" href="/">{{ site.name|default:"Stepping Out" }}</a>
                         <ul class="nav nav">
                             <li{% if request.path == '/' %} class="active"{% endif %}><a href="/">Home</a></li>
                             {% get_flatpages as flatpages %}
