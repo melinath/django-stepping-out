@@ -1,0 +1,25 @@
+{% load daguerre %}
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2><a href="{{ dance.get_absolute_url }}">{{ dance.name }} {% if dance.tagline %}<small>{{ dance.tagline }}</small>{% endif %}</a></h2>
+  </div>
+</div>
+<div class='row-fluid'>
+  <div class='span2'>
+    <ul class='thumbnails pull-left'>
+      <li class='span12'>
+        <a class='thumbnail' href="{{ dance.get_absolute_url }}"><img src="{% adjust dance.banner 'fill' width=800 height=600 %}" width=800 height=600 /></a>
+      </li>
+    </ul>
+  </div>
+  <div class='span10'>
+    <ul class='unstyled'>
+      {% with lessons=dance.lessons.all %}
+        {% for lesson in lessons %}
+          <li><strong>{{ lesson.name }}</strong> <span class='muted'>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</span></li>
+        {% endfor %}
+      {% endwith %}
+      <li><strong>Dance</strong> <span class='muted'>{% include "stepping_out/_times.html" with start=dance.start end=dance.end %} // {% include "stepping_out/_prices.html" with object=dance %}</span></li>
+    </ul>
+  </div>
+</div>

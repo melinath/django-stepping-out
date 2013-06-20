@@ -11,9 +11,13 @@ class Venue(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
     website = models.URLField(blank=True)
     #: URL for a custom map (for hard-to-find venues.)
-    custom_map = models.URLField(blank=True,
-                                 help_text="The long form of the link to a "
-                                           "custom google map.")
+    custom_map_url = models.URLField(blank=True,
+                                     help_text="The long form of the link to "
+                                               "a custom google map.")
+    custom_map_image = models.ImageField(
+        blank=True,
+        upload_to="stepping_out/venue/map/%Y/%m/%d"
+    )
     address = models.CharField(max_length=150)
     city = models.CharField(max_length=100, default='Seattle')
     state = USStateField(default='WA')
@@ -172,6 +176,8 @@ class Dance(BasePriceModel):
 
     """
     name = models.CharField(max_length=100)
+    tagline = models.CharField(max_length=100, blank=True)
+    banner = models.ImageField(upload_to="stepping_out/dance/banner/%Y/%m/%d")
     slug = models.SlugField(max_length=100)
     description = models.TextField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
@@ -260,6 +266,8 @@ class ScheduledDance(BasePriceModel):
     )
     WEEKLY = '1,2,3,4,5'
     name = models.CharField(max_length=100)
+    banner = models.ImageField(
+        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d")
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
@@ -323,6 +331,7 @@ class ScheduledDance(BasePriceModel):
 
         defaults = {
             'name': self.name,
+            'banner': self.banner,
             'slug': self.slug,
             'description': self.description,
             'venue': self.venue,

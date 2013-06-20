@@ -106,7 +106,8 @@ class DanceDJInline(admin.TabularInline):
 class DanceAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'description', 'scheduled_dance'),
+            'fields': ('name', 'tagline', 'banner', 'slug', 'description',
+                       'scheduled_dance'),
         }),
         ('Scheduling', {
             'fields': ('is_canceled', 'venue', 'start', 'end', 'hosts'),
@@ -118,7 +119,6 @@ class DanceAdmin(admin.ModelAdmin):
     inlines = [LessonInline, DanceDJInline]
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ('hosts',)
-    readonly_fields = ['scheduled_dance']
     list_display = ['name', 'start', 'venue', 'scheduled_dance']
     list_filter = ['is_canceled', 'venue', 'scheduled_dance']
     date_hierarchy = 'start'
