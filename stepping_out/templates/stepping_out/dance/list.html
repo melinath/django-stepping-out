@@ -8,23 +8,13 @@
       <div class='hero-unit'>
         <h1>Today</h1>
         {% for dance in dances %}
-          {% include "stepping_out/dance/_leadin.html" %}
+          {% include "stepping_out/dance/_leadin.html" with date=0 %}
         {% endfor %}
       </div>
     {% else %}
-      {% if forloop.first and day != today or forloop.counter == 2 %}
-        <h2>This week</h2>
-      {% endif %}
-      <div class="row">
-        <div class="span2">
-          <h2>{{ day|date:"l" }} <br /> <small>{{ day|date:"F jS" }}</small></h2>
-        </div>
-        <div class="span10">
-          {% for dance in dances %}
-            {% include "stepping_out/dance/_leadin.html" %}
-          {% endfor %}
-        </div>
-      </div>
+      {% for dance in dances %}
+        {% include "stepping_out/dance/_leadin.html" with date=1 %}
+      {% endfor %}
     {% endif %}
   {% endfor %}
 {% endblock %}

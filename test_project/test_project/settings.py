@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.flatpages',
     'django.contrib.markup',
     'django.contrib.admin',
+    'django.contrib.humanize',
     'stepping_out',
     'djam',
     'floppyforms',
