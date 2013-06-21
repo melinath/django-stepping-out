@@ -1,12 +1,19 @@
 {# expects objects (with .image and .name attributes) and (optionally) width. #}
 {% load daguerre %}
 {% if people %}
-  <ul class="unstyled">
+<div class='row-fluid'>
+  <ul class="thumbnails">
     {% for person in people %}
-      {% adjust person.image 'fill' width=208 height=128 as image %}
+      {% adjust person.image 'fill' width=208 height=208 as image %}
       {% with stats=person.get_recent_activity_stats %}
-        <li><a href="{{ person.get_absolute_url }}"{% if image or stats.hosted or stats.djed or stats.taught %} class='popover-trigger' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='right' data-container='body' data-content='{% filter escape %}{% if image %}<img src="{{ image }}" width={{ image.width }} height={{ image.height }} />{% endif %}{% if stats.hosted or stats.djed or stats.taught %}<h5>Recent activity</h5><ul>{% if stats.hosted %}<li>Hosted {{ stats.hosted }} dance{{ stats.hosted|pluralize }}</li>{% endif %}{% if stats.djed %}<li>DJed at {{ stats.djed }} dance{{ stats.djed|pluralize }}</li>{% endif %}{% if stats.taught %}<li>Taught {{ stats.taught }} lesson{{ stats.taught|pluralize }}</li>{% endif %}</ul>{% endif %}{% endfilter %}' data-title="{{ person.name }}"{% endif %}>{{ person.name }}</a></li>
+        <li class='span4'>
+            <a class="thumbnail" href="{{ person.get_absolute_url }}">
+                <img src="{{ image }}" />
+            </a>
+            <h4><a href="{{ person.get_absolute_url }}">{{ person.name }}</a></h4>
+        </li>
       {% endwith %}
     {% endfor %}
   </ul>
+</div>
 {% endif %}

@@ -22,8 +22,10 @@ class UpcomingDancesView(ListView):
         end = start + datetime.timedelta(7)
         start = start + datetime.timedelta(hours=.5)
         return Dance.objects.filter(end__gt=start, start__lt=end, is_canceled=False
-                           ).select_related('venue', 'scheduled_dance'
-                           ).prefetch_related('lessons')
+                           ).select_related('venue', 'scheduled_dance',
+                                            'dancedj_set', 'dancedj_set__person'
+                           ).prefetch_related('lessons', 'lessons__teachers',
+                                              'hosts', 'live_acts')
 
     def get_context_data(self, **kwargs):
         context = super(UpcomingDancesView, self).get_context_data(**kwargs)

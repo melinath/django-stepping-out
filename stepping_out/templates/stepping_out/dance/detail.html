@@ -1,14 +1,64 @@
 {% extends "stepping_out/__base.html" %}
 
-{% load url from future %}
+{% load url from future %}{% load humanize markup %}
 
 {% block main %}
   <div class="row">
-    <div class="span7">
-      <h1>{{ dance.name }} <small><time datetime="{{ dance.start|date:'c' }}">{{ dance.start|date:"F jS, Y" }}</time></small></h1>
-      {% include "stepping_out/dance/_inner.html" with dance=dance only %}
+    <div class="span10">
+      <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
     </div>
-    <div class="span5">
+    <div class="span2">
+      <h1><small><time datetime="{{ dance.start|date:'c' }}">{{ dance.start|naturalday:"F jS, Y"|capfirst }}</time></small></h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span8">
+      {% with hosts=dance.hosts.all %}
+        {% if hosts %}
+          <ul class='inline'>
+            <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
+            {% for host in hosts %}
+              <li>{% include "stepping_out/_person.html" with person=host only %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      {{ dance.description|markdown }}
+
+      {% with lessons=dance.lessons.all %}
+        {% for lesson in lessons %}
+          {% with teachers=lesson.teachers.all %}
+              <h3>{{ lesson.name }} <small>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
+              {% if teachers %}
+                <ul class='inline'>
+                  <li><strong>Teacher{{ teachers|length|pluralize }}</strong></li>
+                  {% for teacher in teachers %}
+                    <li>{% include "stepping_out/_person.html" with person=teacher only %}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {{ lesson.description|markdown }}
+          {% endwith %}
+        {% endfor %}
+      {% endwith %}
+      <h3>Dance <small>{% include "stepping_out/_times.html" with start=dance.start end=dance.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
+      {% with djs=dance.dancedj_set.all %}
+        {% if djs %}
+          <table class='table'>
+            <tbody>
+            {% for dj in djs %}
+              <tr>
+                <th>DJ {% include "stepping_out/_person.html" with person=dj.person only %}</th>
+                <td>{% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      {% endwith %}
+    </div>
+    <div class="span4">
       {% if dance.venue %}
         {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
         <h4>
