@@ -1,6 +1,6 @@
 {% extends "stepping_out/__base.html" %}
 
-{% load url from future %}{% load humanize markup %}
+{% load url from future %}{% load humanize markup daguerre %}
 
 {% block main %}
   {% adjust dance.banner 'fill' width=1200 height=300 as image %}
@@ -8,14 +8,23 @@
     <img src="{{ image }}" width={{ image.width }} height={{ image.height }} />
   {% endif %}
 
-  <div class="row">
-    <div class="span10">
-      <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
+  {% if dance.venue %}
+    <div class='pull-right'>
+      {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
+      <h4>
+        <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>
+      {% if dance.venue.website %}<small>({{ dance.venue.website|urlize }})</small>{% endif %}
+      </h4>
     </div>
-    <div class="span2">
-      <h1><small><time datetime="{{ dance.start|date:'c' }}">{{ dance.start|naturalday:"F jS, Y"|capfirst }}</time></small></h1>
-    </div>
-  </div>
+  {% endif %}
+
+  <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
+
+  <dl>
+    <dd><time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
+    <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
+  </dl>
+
   <div class="row">
     <div class="span8">
       {% with hosts=dance.hosts.all %}
@@ -64,13 +73,6 @@
       {% endwith %}
     </div>
     <div class="span4">
-      {% if dance.venue %}
-        {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
-        <h4>
-          <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>
-        {% if dance.venue.website %}<small>({{ dance.venue.website|urlize }})</small>{% endif %}
-        </h4>
-      {% endif %}
     </div>
   </div>
 {% endblock %}
