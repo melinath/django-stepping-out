@@ -1,10 +1,10 @@
 {# expects an object with price, student_price, and custom_price fields #}
 {% if object.price or object.student_price or object.custom_price %}
   {% if object.price %}
-    ${{ object.price }}{% if object.student_price or object.custom_price %},{% endif %}
+    ${{ object.price }} general{% if object.student_price or object.custom_price %} <span class='muted'>&middot;</span> {% endif %}
   {% endif %}
   {% if object.student_price %}
-    ${{ object.student_price }} for students{% if object.custom_price %},{% endif %}
+    ${{ object.student_price }} students{% if object.custom_price %} <span class='muted'>&middot;</span> {% endif %}
   {% endif %}
   {{ object.custom_price }}
 {% else %}

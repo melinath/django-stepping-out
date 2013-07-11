@@ -15,3 +15,17 @@
   {{ block.super }}
   <script src="{% static 'stepping_out/js/stepping_out.kickoff.js' %}"></script>
 {% endblock %}
+
+{% block main %}
+  <div class='row'>
+    <div class='span9'>
+      {% block content %}
+      {% endblock %}
+    </div>
+    <div class='span3'>
+      {% block sidebar %}
+        {% include 'stepping_out/_site_sidebar.html' %}
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}

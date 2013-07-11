@@ -3,6 +3,11 @@
 {% load url from future %}{% load humanize markup %}
 
 {% block main %}
+  {% adjust dance.banner 'fill' width=1200 height=300 as image %}
+  {% if image %}
+    <img src="{{ image }}" width={{ image.width }} height={{ image.height }} />
+  {% endif %}
+
   <div class="row">
     <div class="span10">
       <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>

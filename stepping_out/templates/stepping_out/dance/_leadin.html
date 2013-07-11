@@ -1,28 +1,38 @@
 {% load daguerre humanize %}
-<div class='row-fluid'>
-  <div class='span10'>
-    <h2><a href="{{ dance.get_absolute_url }}">{{ dance.name }} {% if dance.tagline %}<small>{{ dance.tagline }}</small>{% endif %}</a></h2>
-  </div>
-  <div class='span2'>
-    {% if date %}<h2><small><time datetime="{{ dance.start|date:'c' }}">{{ dance.start|naturalday:"l"|capfirst }}</time></small></h2>{% endif %}
-  </div>
-</div>
-<div class='row-fluid'>
-  <div class='span3'>
-    <ul class='thumbnails pull-left'>
-      <li class='span12'>
-        <a class='thumbnail' href="{{ dance.get_absolute_url }}"><img src="{% adjust dance.banner 'fill' width=800 height=600 %}" width=800 height=600 /></a>
-      </li>
-    </ul>
-  </div>
-  <div class='span9'>
-    <ul class='unstyled'>
-      {% with lessons=dance.lessons.all %}
-        {% for lesson in lessons %}
-          <li><strong>{{ lesson.name }}</strong> <span class='muted'>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</span></li>
-        {% endfor %}
-      {% endwith %}
-      <li><strong>Dance</strong> <span class='muted'>{% include "stepping_out/_times.html" with start=dance.start end=dance.end %} // {% include "stepping_out/_prices.html" with object=dance %}</span></li>
-    </ul>
+
+<div class='media'>
+  <a class='pull-left' href="{{ dance.get_absolute_url }}">
+    {% if image %}
+      <img src="{{ image }}" width={{ image.width }} height={{ image.height }} />
+    {% else %}
+      <i class='icon-music icon-media'></i>
+    {% endif %}
+  </a>
+
+  <div class='media-body'>
+    <h4 class='media-heading'><a href="{{ dance.get_absolute_url }}">{{ dance.name }} {% if dance.tagline %}<small>{{ dance.tagline }}</small>{% endif %}</a></h4>
+
+    <dl>
+      <dd>{% if date %}<time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% endif %}{% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
+      <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
+    </dl>
+
+    {% with lessons=dance.lessons.all %}
+      {% if lessons %}
+        <dl>
+          {% for lesson in lessons %}
+            <dt>{{ lesson.name }}</dt>
+            <dd>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %}</dd>
+            <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
+          {% endfor %}
+        </dl>
+      {% endif %}
+    {% endwith %}
+
+    <div class='row'>
+      <div class='span4'>
+        <a href='{{ dance.get_absolute_url }}' class='btn btn-success'>Details <i class='icon-chevron-right'></i></a>
+      </div>
+    </div>
   </div>
 </div>
