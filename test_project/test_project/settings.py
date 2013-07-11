@@ -134,6 +134,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "stepping_out.context_processors.site",
+    "djam.context_processors.default_admin",
 )
 
 # A sample logging configuration. The only tangible logging
