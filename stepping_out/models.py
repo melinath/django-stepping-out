@@ -201,6 +201,8 @@ class Dance(BasePriceModel):
         ordering = ('start', 'end')
 
     def __unicode__(self):
+        if self.start is None:
+            return self.name
         start = self.start.astimezone(get_current_timezone())
         return u"{0} ({1})".format(self.name, start.strftime("%Y-%m-%d"))
 
