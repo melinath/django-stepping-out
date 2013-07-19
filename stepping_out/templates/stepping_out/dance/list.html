@@ -3,22 +3,26 @@
 {% load url from future %}
 {% load daguerre %}
 
-{% block content %}
-  {% for day, dances in dances_grouped %}
-    {% adjust_bulk dances 'banner' 'fill' width=64 height=64 as adjusted %}
-    {% if day == today %}
-      {% adjust_bulk dances 'banner' 'fill' width=128 height=128 as adjusted %}
-      <div class='hero-unit'>
-        <h1>Today</h1>
-        {% for dance, image in adjusted %}
-          {% include "stepping_out/dance/_leadin.html" with date=0 %}
-        {% endfor %}
-      </div>
-    {% else %}
-      {% adjust_bulk dances 'banner' 'fill' width=64 height=64 as adjusted %}
-      {% for dance, image in adjusted %}
-        {% include "stepping_out/dance/_leadin.html" with date=1 %}
+{% block main %}
+  <div class='span8 offset2'>
+    {% block content %}
+      {% for day, dances in dances_grouped %}
+        {% adjust_bulk dances 'banner' 'fill' width=64 height=64 as adjusted %}
+        {% if day == today %}
+          {% adjust_bulk dances 'banner' 'fill' width=128 height=128 as adjusted %}
+          <div class='hero-unit'>
+            <h1>Today</h1>
+            {% for dance, image in adjusted %}
+              {% include "stepping_out/dance/_leadin.html" with date=0 %}
+            {% endfor %}
+          </div>
+        {% else %}
+          {% adjust_bulk dances 'banner' 'fill' width=64 height=64 as adjusted %}
+          {% for dance, image in adjusted %}
+            {% include "stepping_out/dance/_leadin.html" with date=1 %}
+          {% endfor %}
+        {% endif %}
       {% endfor %}
-    {% endif %}
-  {% endfor %}
+    {% endblock %}
+  </div>
 {% endblock %}

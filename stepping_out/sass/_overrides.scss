@@ -20,3 +20,29 @@ body {
 .media-heading + dl{
 	margin-top: 0;
 }
+
+// Disable 1200px styles.
+.stepping_out{
+
+	@media (min-width: 1200px) {
+		// Fixed grid
+		@include grid-core($gridColumnWidth, $gridGutterWidth);
+
+		// Fluid grid
+		@include grid-fluid($fluidGridColumnWidth, $fluidGridGutterWidth);
+
+		// Input grid
+		@include grid-input($gridColumnWidth, $gridGutterWidth);
+
+		// Thumbnails
+		.thumbnails {
+			margin-left: -$gridGutterWidth;
+		}
+		.thumbnails > li {
+			margin-left: $gridGutterWidth;
+		}
+		.row-fluid .thumbnails {
+			margin-left: 0;
+		}
+	}
+}
