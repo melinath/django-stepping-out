@@ -9,7 +9,7 @@
   {% endif %}
 
   {% if dance.venue %}
-    <div class='pull-right'>
+    <div class='pull-right map'>
       {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
       <h4>
         <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>
@@ -25,54 +25,48 @@
     <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
   </dl>
 
-  <div class="row">
-    <div class="span8">
-      {% with hosts=dance.hosts.all %}
-        {% if hosts %}
-          <ul class='inline'>
-            <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
-            {% for host in hosts %}
-              <li>{% include "stepping_out/_person.html" with person=host only %}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endwith %}
-
-      {{ dance.description|markdown }}
-
-      {% with lessons=dance.lessons.all %}
-        {% for lesson in lessons %}
-          {% with teachers=lesson.teachers.all %}
-              <h3>{{ lesson.name }} <small>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
-              {% if teachers %}
-                <ul class='inline'>
-                  <li><strong>Teacher{{ teachers|length|pluralize }}</strong></li>
-                  {% for teacher in teachers %}
-                    <li>{% include "stepping_out/_person.html" with person=teacher only %}</li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-              {{ lesson.description|markdown }}
-          {% endwith %}
+  {% with hosts=dance.hosts.all %}
+    {% if hosts %}
+      <ul class='inline'>
+        <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
+        {% for host in hosts %}
+          <li>{% include "stepping_out/_person.html" with person=host only %}</li>
         {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  {{ dance.description|markdown }}
+
+  {% with lessons=dance.lessons.all %}
+    {% for lesson in lessons %}
+      {% with teachers=lesson.teachers.all %}
+          <h3>{{ lesson.name }} <small>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
+          {% if teachers %}
+            <ul class='inline'>
+              <li><strong>Teacher{{ teachers|length|pluralize }}</strong></li>
+              {% for teacher in teachers %}
+                <li>{% include "stepping_out/_person.html" with person=teacher only %}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          {{ lesson.description|markdown }}
       {% endwith %}
-      <h3>Dance <small>{% include "stepping_out/_times.html" with start=dance.start end=dance.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
-      {% with djs=dance.dancedj_set.all %}
-        {% if djs %}
-          <table class='table'>
-            <tbody>
-            {% for dj in djs %}
-              <tr>
-                <th>DJ {% include "stepping_out/_person.html" with person=dj.person only %}</th>
-                <td>{% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}</td>
-              </tr>
-            {% endfor %}
-            </tbody>
-          </table>
-        {% endif %}
-      {% endwith %}
-    </div>
-    <div class="span4">
-    </div>
-  </div>
+    {% endfor %}
+  {% endwith %}
+  <h3>Dance <small>{% include "stepping_out/_times.html" with start=dance.start end=dance.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
+  {% with djs=dance.dancedj_set.all %}
+    {% if djs %}
+      <table class='table'>
+        <tbody>
+        {% for dj in djs %}
+          <tr>
+            <th>DJ {% include "stepping_out/_person.html" with person=dj.person only %}</th>
+            <td>{% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  {% endwith %}
 {% endblock %}

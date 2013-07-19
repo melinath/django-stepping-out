@@ -94,3 +94,6 @@ body { padding-bottom: 80px; }
   .stepping_out .thumbnails { margin-left: -20px; }
   .stepping_out .thumbnails > li { margin-left: 20px; }
   .stepping_out .row-fluid .thumbnails { margin-left: 0; } }
+
+.map { padding: 8px; background-color: #fff; border: 1px solid #cccccc; border: 1px solid rgba(0, 0, 0, 0.2); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+.map.pull-right { margin-left: 20px; }
