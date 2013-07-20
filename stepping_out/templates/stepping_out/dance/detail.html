@@ -41,7 +41,11 @@
   {% with lessons=dance.lessons.all %}
     {% for lesson in lessons %}
       {% with teachers=lesson.teachers.all %}
-          <h3>{{ lesson.name }} <small>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
+          <h3>{{ lesson.name }}</h3>
+          <dl>
+            <dd>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %}</dd>
+            <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
+          </dl>
           {% if teachers %}
             <ul class='inline'>
               <li><strong>Teacher{{ teachers|length|pluralize }}</strong></li>
@@ -54,9 +58,10 @@
       {% endwith %}
     {% endfor %}
   {% endwith %}
-  <h3>Dance <small>{% include "stepping_out/_times.html" with start=dance.start end=dance.end %} // {% include "stepping_out/_prices.html" with object=lesson %}</small></h3>
+
   {% with djs=dance.dancedj_set.all %}
     {% if djs %}
+      <h3>DJs</h3>
       <table class='table'>
         <tbody>
         {% for dj in djs %}
