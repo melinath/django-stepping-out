@@ -9,7 +9,7 @@
 
     <h4>Dances</h4>
     {% for dance in venue.scheduled_dances.all %}
-        <h5><a href="{% url 'stepping_out_scheduled_dance_detail' slug=dance.slug %}">{{ dance.name }}</a>
+        <h5><a href="{% url 'stepping_out_scheduled_dance_detail' pk=dance.pk slug=dance.name|slugify %}">{{ dance.name }}</a>
             <small>
                 {% with weeks=dance.get_weeks %}
                     {% if weeks|length == 5 %}

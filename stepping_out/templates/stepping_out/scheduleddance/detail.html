@@ -16,7 +16,7 @@
       {% else %}
           {% include "stepping_out/dance/_inner.html" with dance=next_dance only %}
           {% if next_dance.venue and next_dance.venue != scheduled_dance.venue %}
-            <h3>Special venue: <a href="{% url 'stepping_out_venue_detail' slug=next_dance.venue.slug %}">{{ next_dance.venue.name }}</a></h3>
+            <h3>Special venue: <a href="{% url 'stepping_out_venue_detail' pk=next_dance.venue.pk slug=next_dance.venue.name|slugify %}">{{ next_dance.venue.name }}</a></h3>
             {% include "stepping_out/_venue_map.html" with venue=next_dance.venue only %}
           {% endif %}
       {% endif %}

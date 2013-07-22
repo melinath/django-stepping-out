@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils.timezone import get_current_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 from django_localflavor_us.models import USStateField
@@ -8,7 +9,6 @@ from django_localflavor_us.models import USStateField
 
 class Venue(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True)
     website = models.URLField(blank=True)
     #: URL for a custom map (for hard-to-find venues.)
     custom_map_url = models.URLField(blank=True,
@@ -30,7 +30,6 @@ class Venue(models.Model):
 
 class Person(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True)
     bio = models.TextField(blank=True)
     user = models.OneToOneField('auth.User', blank=True, null=True)
     image = models.ImageField(upload_to='stepping_out/person/%Y/%m/%d',
@@ -45,7 +44,7 @@ class Person(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('stepping_out_person_detail', (),
-                {'slug': self.slug})
+                {'slug': slugify(self.name), 'pk': self.pk})
 
     def get_recent_activity(self):
         """
@@ -91,7 +90,6 @@ class Person(models.Model):
 
 class LiveAct(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='stepping_out/live_act/%Y/%m/%d',
                               blank=True)
@@ -102,7 +100,7 @@ class LiveAct(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('stepping_out_liveact_detail', (),
-                {'slug': self.slug})
+                {'slug': slugify(self.name), 'pk': self.pk})
 
 
 class BaseTimeOrderModel(models.Model):
@@ -135,7 +133,7 @@ class DanceDJ(BaseTimeOrderModel):
     @models.permalink
     def get_absolute_url(self):
         return ('stepping_out_person_detail', (),
-                {'slug': self.person.slug})
+                {'pk': self.person_id})
 
 
 class DanceLiveAct(BaseTimeOrderModel):
@@ -153,7 +151,7 @@ class DanceLiveAct(BaseTimeOrderModel):
     @models.permalink
     def get_absolute_url(self):
         return ('stepping_out_liveact_detail', (),
-                {'slug': self.live_act.slug})
+                {'pk': self.live_act_id})
 
 
 class BasePriceModel(models.Model):
@@ -178,7 +176,6 @@ class Dance(BasePriceModel):
     name = models.CharField(max_length=100)
     tagline = models.CharField(max_length=100, blank=True)
     banner = models.ImageField(upload_to="stepping_out/dance/banner/%Y/%m/%d")
-    slug = models.SlugField(max_length=100)
     description = models.TextField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
     hosts = models.ManyToManyField(Person, blank=True, related_name='host_for')
@@ -211,8 +208,11 @@ class Dance(BasePriceModel):
         tzinfo = get_current_timezone()
         start = self.start.astimezone(tzinfo)
         return ('stepping_out_dance_detail', (),
-                {'slug': self.slug, 'day': str(start.day).zfill(2),
-                 'month': str(start.month).zfill(2), 'year': str(start.year).zfill(4)})
+                {'slug': slugify(self.name),
+                 'pk': self.pk,
+                 'day': str(start.day).zfill(2),
+                 'month': str(start.month).zfill(2),
+                 'year': str(start.year).zfill(4)})
 
 
 class Lesson(BasePriceModel):
@@ -221,7 +221,6 @@ class Lesson(BasePriceModel):
 
     """
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100)
     description = models.TextField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
     teachers = models.ManyToManyField(Person, blank=True)
@@ -235,10 +234,11 @@ class Lesson(BasePriceModel):
     dance_included = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ('slug', 'dance')
         ordering = ('start', 'end')
 
     def __unicode__(self):
+        if self.start is None:
+            return self.name
         start = self.start.astimezone(get_current_timezone())
         return u"{0} ({1}, {2})".format(self.name, self.dance.name,
                                         start.strftime("%Y-%m-%d"))
@@ -270,7 +270,6 @@ class ScheduledDance(BasePriceModel):
     name = models.CharField(max_length=100)
     banner = models.ImageField(
         upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d")
-    slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
     venue = models.ForeignKey(Venue,
@@ -334,7 +333,6 @@ class ScheduledDance(BasePriceModel):
         defaults = {
             'name': self.name,
             'banner': self.banner,
-            'slug': self.slug,
             'description': self.description,
             'venue': self.venue,
             'price': self.price,
@@ -366,7 +364,6 @@ class ScheduledLesson(BasePriceModel):
     scheduled_dance = models.ForeignKey(ScheduledDance,
                                         related_name='scheduled_lessons')
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100)
     description = models.TextField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
     start = models.TimeField(blank=True, null=True)
@@ -395,7 +392,6 @@ class ScheduledLesson(BasePriceModel):
 
         defaults = {
             'name': self.name,
-            'slug': self.slug,
             'description': self.description,
             'venue': self.venue,
             'price': self.price,
@@ -415,9 +411,6 @@ class ScheduledLesson(BasePriceModel):
         }
         return Lesson.objects.get_or_create(defaults=defaults,
                                             **kwargs)
-
-    class Meta:
-        unique_together = ('slug', 'scheduled_dance')
 
     def __unicode__(self):
         return u"{0} ({1})".format(self.name, self.scheduled_dance.name)

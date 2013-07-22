@@ -12,7 +12,7 @@
     <div class='pull-right map'>
       {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
       <h4>
-        <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a>
+        <a href="{% url 'stepping_out_venue_detail' pk=dance.venue.pk slug=dance.venue.name|slugify %}">{{ dance.venue.name }}</a>
       {% if dance.venue.website %}<small>({{ dance.venue.website|urlize }})</small>{% endif %}
       </h4>
     </div>

@@ -4,7 +4,7 @@
 
 {% block main %}
   {% for dance in scheduled_dances %}
-    <h3><a href="{% url 'stepping_out_scheduled_dance_detail' slug=dance.slug %}">{{ dance.name }}</a>{% if dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' slug=dance.venue.slug %}">{{ dance.venue.name }}</a></small>{% endif %}</h3>
+    <h3><a href="{% url 'stepping_out_scheduled_dance_detail' pk=dance.pk slug=dance.name|slugify %}">{{ dance.name }}</a>{% if dance.venue %} <small>at <a href="{% url 'stepping_out_venue_detail' pk=dance.venue.pk slug=dance.venue.name|slugify %}">{{ dance.venue.name }}</a></small>{% endif %}</h3>
     <div class="row">
       <div class="span6">
         <h4>

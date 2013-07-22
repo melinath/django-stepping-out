@@ -1,8 +1,9 @@
 import datetime
 
+from django.http import HttpResponseRedirect
 from django.utils.datastructures import SortedDict
 from django.utils.timezone import get_current_timezone, utc, now
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, DateDetailView
 
 from stepping_out.models import ScheduledDance, Dance
 
@@ -42,7 +43,29 @@ class UpcomingDancesView(ListView):
         return context
 
 
-class ScheduledDanceDetailView(DetailView):
+class FakeSlugDetailMixin(object):
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        expected_url = self.object.get_absolute_url()
+        if request.path_info != expected_url:
+            return HttpResponseRedirect(expected_url)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+
+class FakeSlugDetailView(FakeSlugDetailMixin, DetailView):
+    pass
+
+
+class DanceDetailView(FakeSlugDetailMixin, DateDetailView):
+    context_object_name = 'dance'
+    queryset = Dance.objects.select_related('venue')
+    template_name = 'stepping_out/dance/detail.html'
+    date_field = 'start'
+    allow_future = True
+
+
+class ScheduledDanceDetailView(FakeSlugDetailMixin, DetailView):
     model = ScheduledDance
     context_object_name = 'scheduled_dance'
 

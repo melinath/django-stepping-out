@@ -15,7 +15,7 @@ class ScheduledLessonInline(admin.StackedInline):
     model = ScheduledLesson
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'description'),
+            'fields': ('name', 'description'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'scheduled_dance'),
@@ -26,14 +26,13 @@ class ScheduledLessonInline(admin.StackedInline):
         })
     )
     extra = 1
-    prepopulated_fields = {"slug": ("name",)}
 
 
 class ScheduledDanceAdmin(admin.ModelAdmin):
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'banner', 'description', 'website'),
+            'fields': ('name', 'banner', 'description', 'website'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'weekday', 'weeks'),
@@ -43,7 +42,6 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
         })
     )
     inlines = [ScheduledLessonInline]
-    prepopulated_fields = {"slug": ("name",)}
     actions = ['create_next_dances']
     list_display = ['name', 'venue', 'start', 'get_schedule']
     list_filter = ['venue', 'weekday']
@@ -72,7 +70,6 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
 
 class VenueAdmin(admin.ModelAdmin):
     form = VenueForm
-    prepopulated_fields = {"slug": ("name",)}
     list_display = ['name', 'address', 'city', 'state']
     list_filter = ['state']
 
@@ -81,7 +78,7 @@ class LessonInline(admin.StackedInline):
     model = Lesson
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'description'),
+            'fields': ('name', 'description'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'dance',
@@ -93,7 +90,6 @@ class LessonInline(admin.StackedInline):
         })
     )
     extra = 1
-    prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ('teachers',)
 
 
@@ -106,7 +102,7 @@ class DanceDJInline(admin.TabularInline):
 class DanceAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('name', 'tagline', 'banner', 'slug', 'description',
+            'fields': ('name', 'tagline', 'banner', 'description',
                        'scheduled_dance'),
         }),
         ('Scheduling', {
@@ -117,7 +113,6 @@ class DanceAdmin(admin.ModelAdmin):
         })
     )
     inlines = [LessonInline, DanceDJInline]
-    prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ('hosts',)
     list_display = ['name', 'start', 'venue', 'scheduled_dance']
     list_filter = ['is_canceled', 'venue', 'scheduled_dance']
@@ -129,7 +124,6 @@ class PersonAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.ImageField: {'widget': AreaWidget},
     }
-    prepopulated_fields = {"slug": ("name",)}
     list_display = ['name']
     ordering = ('name',)
 
