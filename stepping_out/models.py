@@ -9,6 +9,8 @@ from django_localflavor_us.models import USStateField
 
 class Venue(models.Model):
     name = models.CharField(max_length=100)
+    banner = models.ImageField(upload_to="stepping_out/venue/banner/%Y/%m/%d",
+                               blank=True)
     website = models.URLField(blank=True)
     #: URL for a custom map (for hard-to-find venues.)
     custom_map_url = models.URLField(blank=True,
@@ -26,6 +28,11 @@ class Venue(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_venue_detail', (),
+                {'slug': slugify(self.name), 'pk': self.pk})
 
 
 class Person(models.Model):
@@ -175,7 +182,8 @@ class Dance(BasePriceModel):
     """
     name = models.CharField(max_length=100)
     tagline = models.CharField(max_length=100, blank=True)
-    banner = models.ImageField(upload_to="stepping_out/dance/banner/%Y/%m/%d")
+    banner = models.ImageField(upload_to="stepping_out/dance/banner/%Y/%m/%d",
+                               blank=True)
     description = models.TextField(blank=True)
     venue = models.ForeignKey(Venue, blank=True, null=True)
     hosts = models.ManyToManyField(Person, blank=True, related_name='host_for')
@@ -269,7 +277,8 @@ class ScheduledDance(BasePriceModel):
     WEEKLY = '1,2,3,4,5'
     name = models.CharField(max_length=100)
     banner = models.ImageField(
-        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d")
+        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
+        blank=True)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
     venue = models.ForeignKey(Venue,
