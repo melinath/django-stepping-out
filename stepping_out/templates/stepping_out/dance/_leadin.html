@@ -14,6 +14,7 @@
 
     <dl>
       <dd>{% if date %}<time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% endif %}{% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
+      <dd>{% if dance.venue.neighborhood %}{{ dance.venue.neighborhood }}, {% endif %}{{ dance.venue.city }}, {{ dance.venue.state }}</dd>
       <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
     </dl>
 

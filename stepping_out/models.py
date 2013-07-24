@@ -20,6 +20,7 @@ class Venue(models.Model):
         blank=True,
         upload_to="stepping_out/venue/map/%Y/%m/%d"
     )
+    neighborhood = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=150)
     city = models.CharField(max_length=100, default='Seattle')
     state = USStateField(default='WA')

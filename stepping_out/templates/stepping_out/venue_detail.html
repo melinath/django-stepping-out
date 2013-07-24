@@ -6,6 +6,7 @@
   {% include 'stepping_out/_banner.html' with banner=venue.banner %}
 
   <div class='pull-right info-box'>
+    <h3>{% if venue.neighborhood %}{{ venue.neighborhood }}, {% endif %}{{ venue.city }}, {{ venue.state }}</h3>
     {% include "stepping_out/_venue_map.html" with venue=venue only %}
     {% with scheduled_dances=venue.scheduled_dances.all %}
       {% for scheduled_dance in scheduled_dances %}

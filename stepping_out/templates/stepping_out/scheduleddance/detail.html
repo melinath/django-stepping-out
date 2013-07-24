@@ -1,6 +1,6 @@
 {% extends "stepping_out/__base.html" %}
 
-{% load url from future %}
+{% load url from future %}{% load markup %}
 
 {% block main %}
   {# put 'about' in info box and just have feed on the left. #}
@@ -8,6 +8,9 @@
 
   <div class='pull-right info-box'>
     <h3>{% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance only %}</h3>
+
+    {{ scheduled_dance.description|markdown }}
+
     <dl>
       {% with lessons=scheduled_dance.scheduled_lessons.all %}
         {% if lessons %}
