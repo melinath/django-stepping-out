@@ -3,7 +3,8 @@ from django.views.generic import ListView
 
 from stepping_out.models import ScheduledDance, Venue, Person, LiveAct
 from stepping_out.views import (ScheduledDanceDetailView, UpcomingDancesView,
-                                FakeSlugDetailView, DanceDetailView)
+                                FakeSlugDetailView, DanceDetailView,
+                                VenueDetailView)
 
 
 urlpatterns = patterns('',
@@ -30,8 +31,7 @@ urlpatterns = patterns('',
                          context_object_name='venues'),
         name='stepping_out_venues'),
     url(r'^venues/(?P<pk>\d+)/(?:(?P<slug>[\w-]+)/)?$',
-        FakeSlugDetailView.as_view(model=Venue,
-                                   context_object_name='venue'),
+        VenueDetailView.as_view(),
         name='stepping_out_venue_detail'),
 
     url(r'^people/(?P<pk>\d+)/(?:(?P<slug>[\w-]+)/)?$',

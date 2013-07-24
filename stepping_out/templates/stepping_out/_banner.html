@@ -1,0 +1,5 @@
+{% load daguerre %}
+{% adjust banner 'fill' width=1200 height=300 as image %}
+{% if image %}
+<img class='img-banner' src="{{ image }}" width={{ image.width }} height={{ image.height }} />
+{% endif %}

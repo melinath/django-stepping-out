@@ -291,6 +291,11 @@ class ScheduledDance(BasePriceModel):
     start = models.TimeField(blank=True, null=True)
     end = models.TimeField(blank=True, null=True)
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_scheduled_dance_detail', (),
+                {'pk': self.pk, 'slug': slugify(self.name)})
+
     def __unicode__(self):
         return self.name
 

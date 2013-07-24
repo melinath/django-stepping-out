@@ -3,20 +3,29 @@
 {% load url from future %}{% load humanize markup daguerre %}
 
 {% block main %}
-  {% adjust dance.banner 'fill' width=1200 height=300 as image %}
-  {% if image %}
-    <img src="{{ image }}" width={{ image.width }} height={{ image.height }} />
-  {% endif %}
+  {% include 'stepping_out/_banner.html' with banner=dance.banner %}
 
-  {% if dance.venue %}
-    <div class='pull-right map'>
-      {% include "stepping_out/_venue_map.html" with venue=dance.venue only %}
-      <h4>
-        <a href="{% url 'stepping_out_venue_detail' pk=dance.venue.pk slug=dance.venue.name|slugify %}">{{ dance.venue.name }}</a>
-      {% if dance.venue.website %}<small>({{ dance.venue.website|urlize }})</small>{% endif %}
-      </h4>
-    </div>
-  {% endif %}
+  {% with venue=dance.venue scheduled_dance=dance.scheduled_dance %}
+    {% if venue or scheduled_dance %}
+      <div class='pull-right info-box'>
+        {% if venue %}
+          {% include "stepping_out/_venue_map.html" with venue=venue only %}
+          <h4>
+            <a href="{{ venue.get_absolute_url }}">{{ venue.name }}</a>
+          {% if venue.website %}<small>({{ venue.website|urlize }})</small>{% endif %}
+          </h4>
+        {% endif %}
+        {% if scheduled_dance %}
+          <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
+        {% endif %}
+        {% if scheduled_dances %}
+          {% for scheduled_dance in scheduled_dances %}
+            <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
+          {% endfor %}
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
   <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
 
