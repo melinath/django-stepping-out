@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.utils.datastructures import SortedDict
 from django.utils.timezone import get_current_timezone, utc, now
@@ -17,7 +18,9 @@ def _get_upcoming_dances(scheduled_dances):
     start = now().astimezone(utc)
     end = start + datetime.timedelta(7)
     start = start + datetime.timedelta(hours=.5)
-    return Dance.objects.filter(end__gt=start, start__lt=end,
+    return Dance.objects.filter(end__gt=start,
+                                start__lt=end,
+                                sites=Site.objects.get_current(),
                                 ).prefetch_related('lessons')
 
 
@@ -36,7 +39,9 @@ class UpcomingDancesView(ListView):
     template_name = 'stepping_out/dance/list.html'
 
     def get_queryset(self):
-        return _get_upcoming_dances(ScheduledDance.objects.all())
+        site = Site.objects.get_current()
+        scheduled = ScheduledDance.objects.filter(sites=site)
+        return _get_upcoming_dances(scheduled)
 
     def get_context_data(self, **kwargs):
         context = super(UpcomingDancesView, self).get_context_data(**kwargs)
@@ -65,10 +70,14 @@ class FakeSlugDetailView(FakeSlugDetailMixin, DetailView):
 
 class DanceDetailView(FakeSlugDetailMixin, DateDetailView):
     context_object_name = 'dance'
-    queryset = Dance.objects.select_related('venue', 'scheduled_dance')
     template_name = 'stepping_out/dance/detail.html'
     date_field = 'start'
     allow_future = True
+
+    def get_queryset(self):
+        site = Site.objects.get_current()
+        return Dance.objects.select_related('venue', 'scheduled_dance'
+                                            ).filter(sites=site)
 
 
 class VenueDetailView(FakeSlugDetailView):
@@ -92,6 +101,10 @@ class VenueDetailView(FakeSlugDetailView):
 class ScheduledDanceDetailView(FakeSlugDetailMixin, DetailView):
     model = ScheduledDance
     context_object_name = 'scheduled_dance'
+
+    def get_queryset(self):
+        qs = super(ScheduledDanceDetailView, self).get_queryset()
+        return qs.filter(sites=Site.objects.get_current())
 
     def get_context_data(self, **kwargs):
         context = super(ScheduledDanceDetailView, self).get_context_data(**kwargs)

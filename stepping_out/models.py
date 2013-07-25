@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.sites.models import Site
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.timezone import get_current_timezone, utc
@@ -202,6 +203,7 @@ class Dance(BasePriceModel):
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     is_canceled = models.BooleanField(default=False)
+    sites = models.ManyToManyField(Site, blank=True)
 
     class Meta:
         ordering = ('start', 'end')
@@ -291,6 +293,7 @@ class ScheduledDance(BasePriceModel):
                                               default=WEEKLY)
     start = models.TimeField(blank=True, null=True)
     end = models.TimeField(blank=True, null=True)
+    sites = models.ManyToManyField(Site, blank=True)
 
     @models.permalink
     def get_absolute_url(self):
@@ -366,6 +369,7 @@ class ScheduledDance(BasePriceModel):
         dance, created = Dance.objects.get_or_create(defaults=defaults,
                                                      **kwargs)
         if created:
+            dance.sites = self.sites.all()
             for scheduled_lesson in self.scheduled_lessons.all():
                 scheduled_lesson.get_or_create_lesson(dance)
         return dance, created

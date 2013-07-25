@@ -32,7 +32,7 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
-            'fields': ('name', 'banner', 'description', 'website'),
+            'fields': ('name', 'banner', 'description', 'website', 'sites'),
         }),
         ('Scheduling', {
             'fields': ('venue', 'start', 'end', 'weekday', 'weeks'),
@@ -103,7 +103,7 @@ class DanceAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('name', 'tagline', 'banner', 'description',
-                       'scheduled_dance'),
+                       'scheduled_dance', 'sites'),
         }),
         ('Scheduling', {
             'fields': ('is_canceled', 'venue', 'start', 'end', 'hosts'),
