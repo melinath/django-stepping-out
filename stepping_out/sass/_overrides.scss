@@ -9,42 +9,16 @@ body {
 	line-height: 64px;
 	text-align: center;
 	text-decoration: none;
-	color: $black;
+	color: #000;
 }
 
 .hero-unit .media-heading {
-	line-height: $baseLineHeight * 2;
-	font-size: $baseFontSize * 1.75;
+	line-height: $base-line-height * 2;
+	font-size: $base-font-size * 1.75;
 }
 
 .media-heading + dl{
 	margin-top: 0;
-}
-
-// Disable 1200px styles.
-.stepping_out{
-
-	@media (min-width: 1200px) {
-		// Fixed grid
-		@include grid-core($gridColumnWidth, $gridGutterWidth);
-
-		// Fluid grid
-		@include grid-fluid($fluidGridColumnWidth, $fluidGridGutterWidth);
-
-		// Input grid
-		@include grid-input($gridColumnWidth, $gridGutterWidth);
-
-		// Thumbnails
-		.thumbnails {
-			margin-left: -$gridGutterWidth;
-		}
-		.thumbnails > li {
-			margin-left: $gridGutterWidth;
-		}
-		.row-fluid .thumbnails {
-			margin-left: 0;
-		}
-	}
 }
 
 .info-box {
@@ -54,9 +28,9 @@ body {
 	border: 1px solid #ccc;
 	border: 1px solid rgba(0,0,0,.2);
 	@include box-shadow(0 1px 3px rgba(0,0,0,.1));
-	margin-bottom: $baseLineHeight;
+	margin-bottom: $base-line-height;
 
 	&.pull-right{
-		margin-left: $baseLineHeight;
+		margin-left: $base-line-height;
 	}
 }

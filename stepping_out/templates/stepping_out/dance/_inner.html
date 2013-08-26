@@ -15,10 +15,10 @@
         {% with teachers=lesson.teachers.all %}
           {% if teachers %}
             <div class='row'>
-              <div class='span1'>
+              <div class='col-md-1'>
                 <p><strong>Teachers</strong></p>
               </div>
-              <div class='span4'>
+              <div class='col-md-4'>
                 {% include "stepping_out/_people.html" with people=teachers only %}
               </div>
             </div>
@@ -31,10 +31,10 @@
       {% with hosts=dance.hosts.all %}
         {% if hosts %}
           <div class='row'>
-            <div class='span1'>
+            <div class='col-md-1'>
               <p><strong>Hosts</strong></p>
             </div>
-            <div class='span4'>
+            <div class='col-md-4'>
               {% include "stepping_out/_people.html" with people=hosts only %}
             </div>
           </div>
@@ -43,10 +43,10 @@
       {% with djs=dance.djs.all %}
         {% if djs %}
           <div class='row'>
-            <div class='span1'>
+            <div class='col-md-1'>
               <p><strong>DJs</strong></p>
             </div>
-            <div class='span4'>
+            <div class='col-md-4'>
               {% include "stepping_out/_people.html" with people=djs only %}
             </div>
           </div>
@@ -55,10 +55,10 @@
       {% with live_acts=dance.live_acts.all %}
         {% if live_acts %}
           <div class='row'>
-            <div class='span1'>
+            <div class='col-md-1'>
               <p><strong>Live Acts</strong></p>
             </div>
-            <div class='span4'>
+            <div class='col-md-4'>
               {% include "stepping_out/_people.html" with people=live_acts only %}
             </div>
           </div>

@@ -2,30 +2,30 @@
 {% load markup %}
 {% if object.start %}
   <div class='row'>
-    <div class='span1'>
+    <div class='col-md-1'>
       <p><strong>Time</strong></p>
     </div>
-    <div class='span4'>
+    <div class='col-md-4'>
       {% include 'stepping_out/_times.html' with start=object.start end=object.end only %}
     </div>
   </div>
 {% endif %}
 {% if object.price or object.student_price or object.custom_price %}
   <div class='row'>
-    <div class='span1'>
+    <div class='col-md-1'>
       <p><strong>Price</strong></p>
     </div>
-    <div class='span4'>
+    <div class='col-md-4'>
       {% include 'stepping_out/_prices.html' with object=object only %}
     </div>
   </div>
 {% endif %}
 {% if object.description %}
   <div class='row'>
-    <div class='span1'>
+    <div class='col-md-1'>
       <p><strong>Description</strong></p>
     </div>
-    <div class='span4'>
+    <div class='col-md-4'>
       {{ object.description|markdown }}
     </div>
   </div>

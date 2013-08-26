@@ -4,12 +4,12 @@
 
 {% block main %}
   <div class="row">
-    <div class="span2">
+    <div class="col-md-2">
       {% if live_act.image %}
         <img class='img-polaroid' src="{% adjust live_act.image 'fill' width=200 max_height=400 %}" />
       {% endif %}
     </div>
-    <div class="span10">
+    <div class="col-md-10">
       <h1>{{ live_act.name }}</h1>
       {% if live_act.description %}
         <h2>Description</h2>

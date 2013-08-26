@@ -6,7 +6,7 @@
     {% for person in people %}
       {% adjust person.image 'fill' width=208 height=208 as image %}
       {% with stats=person.get_recent_activity_stats %}
-        <li class='span4'>
+        <li class='col-md-4'>
             <a class="thumbnail" href="{{ person.get_absolute_url }}">
                 <img src="{{ image }}" />
             </a>

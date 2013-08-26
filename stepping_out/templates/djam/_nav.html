@@ -1,34 +1,32 @@
 {% load flatpages %}
 <div class="navbar navbar-inverse navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container">
-      <a class="brand" href="/">{{ site.name|default:"Stepping Out" }}</a>
-      <ul class="nav">
-        {% get_flatpages as flatpages %}
-        {% for page in flatpages %}
-          {% include "djam/_nav_item.html" with url=page.url text=page.title %}
-        {% endfor %}
-      </ul>
-      <ul class="nav pull-right">
-        {% if not user.is_authenticated %}
-          {% url 'djam:auth:login' as url %}
-          {% include "djam/_nav_item.html" with url=url text="Login" %}
-        {% else %}
-          <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class='icon-user'></i> {{ user.username }} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            {% if user.is_staff %}
-              {% url 'djam:dashboard:dashboard' as url %}
-              {% include "djam/_nav_item.html" with url=url text="Admin" %}
-            {% endif %}
-            {% url 'djam:auth:password-change' as url %}
-            {% include "djam/_nav_item.html" with url=url text="Change Password" %}
-            {% url 'djam:auth:logout' as url %}
-            {% include "djam/_nav_item.html" with url=url text="Logout" %}
-          </ul>
-          </li>
-        {% endif %}
-      </ul>
-    </div>
+  <div class="container">
+    <a class="navbar-brand" href="/">{{ site.name|default:"Stepping Out" }}</a>
+    <ul class="nav navbar-nav pull-left">
+      {% get_flatpages as flatpages %}
+      {% for page in flatpages %}
+        {% include "djam/_nav_item.html" with url=page.url text=page.title %}
+      {% endfor %}
+    </ul>
+    <ul class="nav navbar-nav pull-right">
+      {% if not user.is_authenticated %}
+        {% url 'djam:auth:login' as url %}
+        {% include "djam/_nav_item.html" with url=url text="Login" %}
+      {% else %}
+        <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class='icon-user'></i> {{ user.username }} <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          {% if user.is_staff %}
+            {% url 'djam:dashboard:dashboard' as url %}
+            {% include "djam/_nav_item.html" with url=url text="Admin" %}
+          {% endif %}
+          {% url 'djam:auth:password-change' as url %}
+          {% include "djam/_nav_item.html" with url=url text="Change Password" %}
+          {% url 'djam:auth:logout' as url %}
+          {% include "djam/_nav_item.html" with url=url text="Logout" %}
+        </ul>
+        </li>
+      {% endif %}
+    </ul>
   </div>
 </div>
