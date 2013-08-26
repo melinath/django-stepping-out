@@ -3,7 +3,7 @@ import datetime
 from django.contrib.sites.models import Site
 from django.db import models
 from django.template.defaultfilters import slugify
-from django.utils.timezone import get_current_timezone, utc
+from django.utils.timezone import get_current_timezone, utc, make_aware
 from django.utils.translation import ugettext_lazy as _
 from django_localflavor_us.models import USStateField
 
@@ -340,10 +340,10 @@ class ScheduledDance(BasePriceModel):
     def get_or_create_next_dance(self):
         start_day = self.get_next_date()
         tzinfo = get_current_timezone()
-        start = datetime.datetime.combine(start_day, self.start
-                                ).replace(tzinfo=tzinfo)
-        end = datetime.datetime.combine(start_day, self.end
-                              ).replace(tzinfo=tzinfo)
+        start = make_aware(datetime.datetime.combine(start_day, self.start),
+                           tzinfo)
+        end = make_aware(datetime.datetime.combine(start_day, self.end),
+                         tzinfo)
         if end < start:
             # Then it ends the next day.
             end = end + datetime.timedelta(1)
@@ -401,10 +401,10 @@ class ScheduledLesson(BasePriceModel):
             raise ValueError
         tzinfo = get_current_timezone()
         start_day = dance.start.astimezone(tzinfo).date()
-        start = datetime.datetime.combine(start_day, self.start
-                                ).replace(tzinfo=tzinfo)
-        end = datetime.datetime.combine(start_day, self.end
-                              ).replace(tzinfo=tzinfo)
+        start = make_aware(datetime.datetime.combine(start_day, self.start),
+                           tzinfo)
+        end = make_aware(datetime.datetime.combine(start_day, self.end),
+                         tzinfo)
         if end < start:
             # Then it ends the next day.
             end = end + datetime.timedelta(1)
