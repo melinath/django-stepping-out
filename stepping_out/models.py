@@ -337,8 +337,7 @@ class ScheduledDance(BasePriceModel):
 
         raise ValueError("No next date found.")
 
-    def get_or_create_next_dance(self):
-        start_day = self.get_next_date()
+    def get_or_create_dance(self, start_day):
         tzinfo = get_current_timezone()
         start = make_aware(datetime.datetime.combine(start_day, self.start),
                            tzinfo)
@@ -373,6 +372,9 @@ class ScheduledDance(BasePriceModel):
             for scheduled_lesson in self.scheduled_lessons.all():
                 scheduled_lesson.get_or_create_lesson(dance)
         return dance, created
+
+    def get_or_create_next_dance(self):
+        return self.get_or_create_dance(self.get_next_date())
 
 
 class ScheduledLesson(BasePriceModel):
