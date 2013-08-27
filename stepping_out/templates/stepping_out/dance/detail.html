@@ -30,22 +30,41 @@
   <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
 
   <dl>
+    {% with hosts=dance.hosts.all %}
+      {% if hosts %}
+        <dd>
+          <ul class='list-inline'>
+            <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
+            {% for host in hosts %}
+              <li>{% include "stepping_out/_person.html" with person=host only %}</li>
+            {% endfor %}
+          </ul>
+        </dd>
+      {% endif %}
+    {% endwith %}
     <dd><time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
     <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
   </dl>
 
-  {% with hosts=dance.hosts.all %}
-    {% if hosts %}
-      <ul class='inline'>
-        <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
-        {% for host in hosts %}
-          <li>{% include "stepping_out/_person.html" with person=host only %}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
 
   {{ dance.description|markdown }}
+
+  {% with djs=dance.dancedj_set.all %}
+    {% if djs %}
+      <h3>DJs</h3>
+      <div class='row'>
+        {% for dj in djs %}
+          <div class='col-xs-4 col-sm-2'>
+            <a href="{{ dj.person.get_absolute_url }}" class='thumbnail'>
+              <img src="{% adjust dj.person.image 'fill' width=270 max_height=400 %}" />
+            </a>
+            <h3><a href="{{ dj.person.get_absolute_url }}">{{ dj.person.name }}</a></h3>
+            {% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
   {% with lessons=dance.lessons.all %}
     {% for lesson in lessons %}
@@ -56,31 +75,19 @@
             <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
           </dl>
           {% if teachers %}
-            <ul class='inline'>
-              <li><strong>Teacher{{ teachers|length|pluralize }}</strong></li>
+            <div class='row'>
               {% for teacher in teachers %}
-                <li>{% include "stepping_out/_person.html" with person=teacher only %}</li>
+                <div class='col-xs-4 col-sm-2'>
+                  <a href="{{ teacher.get_absolute_url }}" class='thumbnail'>
+                    <img src="{% adjust teacher.image 'fill' width=270 max_height=400 %}" />
+                  </a>
+                  <h3><a href="{{ teacher.get_absolute_url }}">{{ teacher.name }}</a></h3>
+                </div>
               {% endfor %}
-            </ul>
+            </div>
           {% endif %}
           {{ lesson.description|markdown }}
       {% endwith %}
     {% endfor %}
-  {% endwith %}
-
-  {% with djs=dance.dancedj_set.all %}
-    {% if djs %}
-      <h3>DJs</h3>
-      <table class='table'>
-        <tbody>
-        {% for dj in djs %}
-          <tr>
-            <th>DJ {% include "stepping_out/_person.html" with person=dj.person only %}</th>
-            <td>{% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
   {% endwith %}
 {% endblock %}

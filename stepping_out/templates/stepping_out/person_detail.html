@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col-md-3">
       {% if person.image %}
-        <img class='img-polaroid' src="{% adjust person.image 'fill' width=270 max_height=400 %}" />
+        <img class='img-thumbnail' src="{% adjust person.image 'fill' width=270 max_height=400 %}" />
       {% endif %}
     </div>
     <div class="col-md-9">
