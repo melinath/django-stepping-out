@@ -20,3 +20,25 @@ body {
 .media-heading + dl{
 	margin-top: 0;
 }
+
+.img-banner{
+	margin-top: -19px;
+
+    @media (min-width: $screen-sm) {
+    	width: 100%;
+	}
+
+	@media(max-width: $screen-xs-max) {
+		height: 190px;
+		position: relative;
+		left: -50%;
+	}
+}
+
+.img-banner-wrapper{
+	@media(max-width: $screen-xs-max) {
+		position: relative;
+		left: 50%;
+		display: inline-block;
+	}
+}

@@ -5,3 +5,9 @@ body { padding-bottom: 80px; }
 .hero-unit .media-heading { line-height: 48px; font-size: 28px; }
 
 .media-heading + dl { margin-top: 0; }
+
+.img-banner { margin-top: -19px; }
+@media (min-width: 768px) { .img-banner { width: 100%; } }
+@media (max-width: 767px) { .img-banner { height: 190px; position: relative; left: -50%; } }
+
+@media (max-width: 767px) { .img-banner-wrapper { position: relative; left: 50%; display: inline-block; } }
