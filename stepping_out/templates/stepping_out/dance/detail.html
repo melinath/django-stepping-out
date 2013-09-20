@@ -5,9 +5,76 @@
 {% block main %}
   {% include 'stepping_out/_banner.html' with banner=dance.banner %}
 
-  {% with venue=dance.venue scheduled_dance=dance.scheduled_dance %}
-    {% if venue or scheduled_dance %}
-      <div class='pull-right info-box'>
+
+  <div class='row'>
+    <div class='col-xs-12 col-xs-push-12 col-sm-8 col-sm-push-0'>
+      <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
+
+      <dl>
+        {% with hosts=dance.hosts.all %}
+          {% if hosts %}
+            <dd>
+              <ul class='list-inline'>
+                <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
+                {% for host in hosts %}
+                  <li>{% include "stepping_out/_person.html" with person=host only %}</li>
+                {% endfor %}
+              </ul>
+            </dd>
+          {% endif %}
+        {% endwith %}
+        <dd><time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
+        <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
+      </dl>
+
+
+      {{ dance.description|markdown }}
+
+      {% with djs=dance.dancedj_set.all %}
+        {% if djs %}
+          <h3>DJs</h3>
+          <div class='row'>
+            {% for dj in djs %}
+              <div class='col-xs-4'>
+                <a href="{{ dj.person.get_absolute_url }}" class='thumbnail'>
+                  <img src="{% adjust dj.person.image 'fill' width=270 height=330 %}" />
+                </a>
+                <h4><a href="{{ dj.person.get_absolute_url }}">{{ dj.person.name }}</a></h4>
+                {% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% with lessons=dance.lessons.all %}
+        {% for lesson in lessons %}
+          {% with teachers=lesson.teachers.all %}
+              <h3>{{ lesson.name }}</h3>
+              <dl>
+                <dd>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %}</dd>
+                <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
+              </dl>
+              {% if teachers %}
+                <div class='row'>
+                  {% for teacher in teachers %}
+                    <div class='col-xs-4'>
+                      <a href="{{ teacher.get_absolute_url }}" class='thumbnail'>
+                        <img src="{% adjust teacher.image 'fill' width=270 height=330 %}" />
+                      </a>
+                      <h4><a href="{{ teacher.get_absolute_url }}">{{ teacher.name }}</a></h4>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              {{ lesson.description|markdown }}
+          {% endwith %}
+        {% endfor %}
+      {% endwith %}
+    </div>
+
+    <div class='col-xs-12 col-xs-pull-12 col-sm-4 col-sm-pull-0'>
+      {% with venue=dance.venue scheduled_dance=dance.scheduled_dance %}
         {% if venue %}
           {% include "stepping_out/_venue_map.html" with venue=venue only %}
           <h4>
@@ -23,71 +90,7 @@
             <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
           {% endfor %}
         {% endif %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  <h1>{{ dance.name }}{% if dance.tagline %} <small>{{ dance.tagline }}</small>{% endif %}</h1>
-
-  <dl>
-    {% with hosts=dance.hosts.all %}
-      {% if hosts %}
-        <dd>
-          <ul class='list-inline'>
-            <li><strong>Host{{ hosts|length|pluralize }}</strong></li>
-            {% for host in hosts %}
-              <li>{% include "stepping_out/_person.html" with person=host only %}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-    {% endwith %}
-    <dd><time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
-    <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
-  </dl>
-
-
-  {{ dance.description|markdown }}
-
-  {% with djs=dance.dancedj_set.all %}
-    {% if djs %}
-      <h3>DJs</h3>
-      <div class='row'>
-        {% for dj in djs %}
-          <div class='col-xs-4 col-sm-2'>
-            <a href="{{ dj.person.get_absolute_url }}" class='thumbnail'>
-              <img src="{% adjust dj.person.image 'fill' width=270 max_height=400 %}" />
-            </a>
-            <h3><a href="{{ dj.person.get_absolute_url }}">{{ dj.person.name }}</a></h3>
-            {% if dj.start and dj.end %}<span class="muted">{% include "stepping_out/_times.html" with start=dj.start end=dj.end %}</span>{% endif %}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  {% with lessons=dance.lessons.all %}
-    {% for lesson in lessons %}
-      {% with teachers=lesson.teachers.all %}
-          <h3>{{ lesson.name }}</h3>
-          <dl>
-            <dd>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %}</dd>
-            <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
-          </dl>
-          {% if teachers %}
-            <div class='row'>
-              {% for teacher in teachers %}
-                <div class='col-xs-4 col-sm-2'>
-                  <a href="{{ teacher.get_absolute_url }}" class='thumbnail'>
-                    <img src="{% adjust teacher.image 'fill' width=270 max_height=400 %}" />
-                  </a>
-                  <h3><a href="{{ teacher.get_absolute_url }}">{{ teacher.name }}</a></h3>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-          {{ lesson.description|markdown }}
       {% endwith %}
-    {% endfor %}
-  {% endwith %}
+    </div>
+  </div>
 {% endblock %}
