@@ -25,10 +25,8 @@
           <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class='icon-user'></i> {{ user.username }} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            {% if user.is_staff %}
-              {% url 'djam:dashboard:dashboard' as url %}
-              {% include "djam/_nav_item.html" with url=url text="Admin" %}
-            {% endif %}
+            {% url 'djam:dashboard:dashboard' as url %}
+            {% include "djam/_nav_item.html" with url=url text="Admin" %}
             {% url 'djam:auth:password-change' as url %}
             {% include "djam/_nav_item.html" with url=url text="Change Password" %}
             {% url 'djam:auth:logout' as url %}
