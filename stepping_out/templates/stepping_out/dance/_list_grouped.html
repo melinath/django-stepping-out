@@ -1,6 +1,5 @@
 {% load daguerre %}
 {% for day, dances in dances_grouped %}
-  {% adjust_bulk dances 'banner' 'fill' width=64 height=64 as adjusted %}
   {% if day == today %}
     {% adjust_bulk dances 'banner' 'fill' width=128 height=128 as adjusted %}
     <div class='hero-unit'>

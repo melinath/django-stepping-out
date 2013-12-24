@@ -10,24 +10,39 @@
   </a>
 
   <div class='media-body'>
-    <h4 class='media-heading'><a href="{{ dance.get_absolute_url }}">{{ dance.name }} {% if dance.tagline %}<small>{{ dance.tagline }}</small>{% endif %}</a></h4>
-
-    <dl>
-      <dd>{% if date %}<time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% endif %}{% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
-      <dd>{% if dance.venue.neighborhood %}{{ dance.venue.neighborhood }}, {% endif %}{{ dance.venue.city }}, {{ dance.venue.state }}</dd>
-      <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
-    </dl>
-
-    {% with lessons=dance.lessons.all %}
-      {% if lessons %}
-        <dl>
-          {% for lesson in lessons %}
-            <dt>{{ lesson.name }}</dt>
-            <dd>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %}</dd>
-            <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
-          {% endfor %}
-        </dl>
+    <h4 class='media-heading'>
+      {% if dance.is_canceled %}
+        <i class='fa fa-ban text-danger' title='Canceled'></i>
       {% endif %}
-    {% endwith %}
+      <a {% if dance.is_canceled %}class="text-danger" {% endif %}href="{{ dance.get_absolute_url }}">{{ dance.name }}{% if dance.tagline %} <small {% if dance.is_canceled %}class="text-danger"{% endif %}>{{ dance.tagline }}</small>{% elif dance.is_canceled %} <small class="text-danger">Canceled</small>{% endif %}</a>
+    </h4>
+
+    {% if dance.is_canceled %}
+      <dl class='text-muted'>
+        <dd>{% if date %}<time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% endif %}{% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
+        <dd>{% if dance.venue.neighborhood %}{{ dance.venue.neighborhood }}, {% endif %}{{ dance.venue.city }}, {{ dance.venue.state }}</dd>
+      </dl>
+      <div class='text-danger'>
+        {{ dance.description }}
+      </div>
+    {% else %}
+      <dl>
+        <dd>{% if date %}<time datetime="{{ dance.start|date:'c' }}" title="{{ dance.start|date:'F jS, Y' }}" data-placement="right">{{ dance.start|naturalday:"l"|capfirst }}</time>, {% endif %}{% include "stepping_out/_times.html" with start=dance.start end=dance.end %}</dd>
+        <dd>{% if dance.venue.neighborhood %}{{ dance.venue.neighborhood }}, {% endif %}{{ dance.venue.city }}, {{ dance.venue.state }}</dd>
+        <dd>{% include "stepping_out/_prices.html" with object=dance %}</dd>
+      </dl>
+
+      {% with lessons=dance.lessons.all %}
+        {% if lessons %}
+          <dl>
+            {% for lesson in lessons %}
+              <dt>{{ lesson.name }}</dt>
+              <dd>{% include "stepping_out/_times.html" with start=lesson.start end=lesson.end %}</dd>
+              <dd>{% include "stepping_out/_prices.html" with object=lesson %}{% if lesson.dance_included %}<small class='muted'> &middot; Dance included</small>{% endif %}</dd>
+            {% endfor %}
+          </dl>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
   </div>
 </div>
