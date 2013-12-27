@@ -1,8 +1,8 @@
-from django import forms
 from django.core.exceptions import ValidationError
+import floppyforms as forms
 from pygeocoder import Geocoder
 
-from stepping_out.models import ScheduledDance, Venue
+from stepping_out.models import ScheduledDance, Venue, Dance
 
 
 class ScheduledDanceForm(forms.ModelForm):
@@ -55,3 +55,18 @@ class VenueForm(forms.ModelForm):
             instance = self.instance
             coordinates = self._result.coordinates
             instance.latitude, instance.longitude = coordinates
+
+
+class DanceCreateForm(forms.ModelForm):
+    start_day = forms.DateField()
+
+    class Meta:
+        model = Dance
+        fields = ('scheduled_dance',)
+
+    def save(self, **kwargs):
+        scheduled_dance = self.instance.scheduled_dance
+        if not scheduled_dance:
+            return super(DanceCreateForm, self).save(**kwargs)
+        start_day = self.cleaned_data['start_day']
+        return scheduled_dance.get_or_create_dance(start_day)[0]

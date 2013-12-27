@@ -5,7 +5,7 @@ from django.db import models
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
-from stepping_out.forms import ScheduledDanceForm, VenueForm
+from stepping_out.forms import ScheduledDanceForm, VenueForm, DanceCreateForm
 from stepping_out.models import (ScheduledLesson, ScheduledDance,
                                  Venue, Dance, Lesson, Person, DanceDJ,
                                  DanceLiveAct)
@@ -118,6 +118,15 @@ class DanceAdmin(admin.ModelAdmin):
     list_filter = ['is_canceled', 'venue', 'scheduled_dance']
     date_hierarchy = 'start'
     ordering = ('-start',)
+    list_per_page = 20
+
+    # Won't actually be used by ModelAdmin, but riff will catch.
+    add_form = DanceCreateForm
+    add_fieldsets = (
+        (None, {
+            'fields': ('scheduled_dance', 'start_day'),
+        }),
+    )
 
 
 class PersonAdmin(admin.ModelAdmin):
