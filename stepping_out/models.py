@@ -8,18 +8,18 @@ from django.utils.translation import ugettext_lazy as _
 from django_localflavor_us.models import USStateField
 
 
-class Venue(models.Model):
+class Location(models.Model):
     name = models.CharField(max_length=100)
-    banner = models.ImageField(upload_to="stepping_out/venue/banner/%Y/%m/%d",
+    banner = models.ImageField(upload_to="stepping_out/location/banner/%Y/%m/%d",
                                blank=True)
     website = models.URLField(blank=True)
-    #: URL for a custom map (for hard-to-find venues.)
+    #: URL for a custom map (for hard-to-find locations.)
     custom_map_url = models.URLField(blank=True,
                                      help_text="The long form of the link to "
                                                "a custom google map.")
     custom_map_image = models.ImageField(
         blank=True,
-        upload_to="stepping_out/venue/map/%Y/%m/%d"
+        upload_to="stepping_out/location/map/%Y/%m/%d"
     )
     neighborhood = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=150)
@@ -33,7 +33,7 @@ class Venue(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('stepping_out_venue_detail', (),
+        return ('stepping_out_location_detail', (),
                 {'slug': slugify(self.name), 'pk': self.pk})
 
 
@@ -187,7 +187,7 @@ class Dance(BasePriceModel):
     banner = models.ImageField(upload_to="stepping_out/dance/banner/%Y/%m/%d",
                                blank=True)
     description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
     hosts = models.ManyToManyField(Person, blank=True, related_name='host_for')
     djs = models.ManyToManyField(Person,
                                  through=DanceDJ,
@@ -233,7 +233,7 @@ class Lesson(BasePriceModel):
     """
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
     teachers = models.ManyToManyField(Person, blank=True)
     dance = models.ForeignKey(Dance, related_name='lessons')
     start = models.DateTimeField(blank=True, null=True)
@@ -258,7 +258,7 @@ class DanceTemplate(BasePriceModel):
         upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
         blank=True)
     description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     sites = models.ManyToManyField(Site, blank=True)
@@ -280,7 +280,7 @@ class DanceTemplate(BasePriceModel):
             'name': self.name,
             'banner': self.banner,
             'description': self.description,
-            'venue': self.venue,
+            'location': self.location,
             'price': self.price,
             'student_price': self.student_price,
             'custom_price': self.custom_price,
@@ -312,7 +312,7 @@ class LessonTemplate(BasePriceModel):
                                        blank=True, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
@@ -343,7 +343,7 @@ class LessonTemplate(BasePriceModel):
         defaults = {
             'name': self.name,
             'description': self.description,
-            'venue': self.venue,
+            'location': self.location,
             'price': self.price,
             'student_price': self.student_price,
             'custom_price': self.custom_price,

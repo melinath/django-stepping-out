@@ -5,9 +5,9 @@ from django.db import models
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
-from stepping_out.forms import ScheduledDanceForm, VenueForm, DanceCreateForm
+from stepping_out.forms import ScheduledDanceForm, LocationForm, DanceCreateForm
 from stepping_out.models import (ScheduledDance,
-                                 Venue, Dance, Lesson, Person, DanceDJ,
+                                 Location, Dance, Lesson, Person, DanceDJ,
                                  DanceLiveAct, DanceTemplate, LessonTemplate)
 
 
@@ -54,7 +54,7 @@ class LessonTemplateInline(admin.StackedInline):
             'fields': ('name', 'description'),
         }),
         ('Scheduling', {
-            'fields': ('venue', 'start_time', 'end_time', 'dance_template'),
+            'fields': ('location', 'start_time', 'end_time', 'dance_template'),
         }),
         ('Pricing', {
             'fields': ('price', 'student_price', 'custom_price',
@@ -70,7 +70,7 @@ class DanceTemplateAdmin(admin.ModelAdmin):
             'fields': ('name', 'tagline', 'banner', 'description', 'sites'),
         }),
         ('Scheduling', {
-            'fields': ('venue', 'start_time', 'end_time'),
+            'fields': ('location', 'start_time', 'end_time'),
         }),
         ('Pricing', {
             'fields': ('price', 'student_price', 'custom_price')
@@ -78,8 +78,8 @@ class DanceTemplateAdmin(admin.ModelAdmin):
     )
     inlines = [LessonTemplateInline]
     #actions = ['create_next_dances']
-    list_display = ['name', 'venue', 'start_time'] #, 'get_schedule']
-    list_filter = ['venue',]
+    list_display = ['name', 'location', 'start_time'] #, 'get_schedule']
+    list_filter = ['location',]
 
     def get_schedule(self, obj):
         return render_to_string('stepping_out/scheduleddance/_schedule.html',
@@ -103,8 +103,8 @@ class DanceTemplateAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(url)
 
 
-class VenueAdmin(admin.ModelAdmin):
-    form = VenueForm
+class LocationAdmin(admin.ModelAdmin):
+    form = LocationForm
     list_display = ['name', 'address', 'city', 'state']
     list_filter = ['state']
 
@@ -116,7 +116,7 @@ class LessonInline(admin.StackedInline):
             'fields': ('name', 'description'),
         }),
         ('Scheduling', {
-            'fields': ('venue', 'start', 'end', 'dance',
+            'fields': ('location', 'start', 'end', 'dance',
                        'teachers'),
         }),
         ('Pricing', {
@@ -141,7 +141,7 @@ class DanceAdmin(admin.ModelAdmin):
                        'scheduled_dance', 'sites'),
         }),
         ('Scheduling', {
-            'fields': ('is_canceled', 'venue', 'start', 'end', 'hosts'),
+            'fields': ('is_canceled', 'location', 'start', 'end', 'hosts'),
         }),
         ('Pricing', {
             'fields': ('price', 'student_price', 'custom_price')
@@ -149,8 +149,8 @@ class DanceAdmin(admin.ModelAdmin):
     )
     inlines = [LessonInline, DanceDJInline]
     filter_horizontal = ('hosts',)
-    list_display = ['name', 'start', 'venue', 'scheduled_dance']
-    list_filter = ['is_canceled', 'venue', 'scheduled_dance']
+    list_display = ['name', 'start', 'location', 'scheduled_dance']
+    list_filter = ['is_canceled', 'location', 'scheduled_dance']
     date_hierarchy = 'start'
     ordering = ('-start',)
     list_per_page = 20
@@ -173,7 +173,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ScheduledDance, ScheduledDanceAdmin)
-admin.site.register(Venue, VenueAdmin)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(Dance, DanceAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(DanceTemplate, DanceTemplateAdmin)

@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 import floppyforms as forms
 from pygeocoder import Geocoder
 
-from stepping_out.models import ScheduledDance, Venue, Dance
+from stepping_out.models import ScheduledDance, Location, Dance
 
 
 class ScheduledDanceForm(forms.ModelForm):
@@ -20,13 +20,13 @@ class ScheduledDanceForm(forms.ModelForm):
         return ','.join(self.cleaned_data['weeks'])
 
 
-class VenueForm(forms.ModelForm):
+class LocationForm(forms.ModelForm):
     class Meta:
-        model = Venue
+        model = Location
         exclude = ('latitude', 'longitude')
 
     def clean(self):
-        cleaned_data = super(VenueForm, self).clean()
+        cleaned_data = super(LocationForm, self).clean()
         fields = ('address', 'city', 'state')
 
         self._result = None
@@ -50,7 +50,7 @@ class VenueForm(forms.ModelForm):
         return cleaned_data
 
     def _post_clean(self):
-        super(VenueForm, self)._post_clean()
+        super(LocationForm, self)._post_clean()
         if self._result:
             instance = self.instance
             coordinates = self._result.coordinates

@@ -26,12 +26,12 @@
       <dd>{% include 'stepping_out/_times.html' with start=scheduled_dance.start end=scheduled_dance.end datetime_format='H:i' only %}</dd>
       <dd>{% include 'stepping_out/_prices.html' %}</dd>
     </dl>
-    {% with venue=scheduled_dance.venue %}
+    {% with location=scheduled_dance.location %}
       <h4>
-        <a href="{{ venue.get_absolute_url }}">{{ venue.name }}</a>
-      {% if venue.website %}<small>({{ venue.website|urlize }})</small>{% endif %}
+        <a href="{{ location.get_absolute_url }}">{{ location.name }}</a>
+      {% if location.website %}<small>({{ location.website|urlize }})</small>{% endif %}
       </h4>
-      {% include "stepping_out/_venue_map.html" with venue=venue only %}
+      {% include "stepping_out/_location_map.html" with location=location only %}
     {% endwith %}
   </div>
 

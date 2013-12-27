@@ -74,12 +74,12 @@
     </div>
 
     <div class='col-xs-12 col-xs-pull-12 col-sm-4 col-sm-pull-0'>
-      {% with venue=dance.venue scheduled_dance=dance.scheduled_dance %}
-        {% if venue %}
-          {% include "stepping_out/_venue_map.html" with venue=venue only %}
+      {% with location=dance.location scheduled_dance=dance.scheduled_dance %}
+        {% if location %}
+          {% include "stepping_out/_location_map.html" with location=location only %}
           <h4>
-            <a href="{{ venue.get_absolute_url }}">{{ venue.name }}</a>
-          {% if venue.website %}<small>({{ venue.website|urlize }})</small>{% endif %}
+            <a href="{{ location.get_absolute_url }}">{{ location.name }}</a>
+          {% if location.website %}<small>({{ location.website|urlize }})</small>{% endif %}
           </h4>
         {% endif %}
         {% if scheduled_dance %}

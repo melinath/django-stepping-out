@@ -6,7 +6,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.timezone import get_current_timezone, utc, now
 from django.views.generic import DetailView, ListView, DateDetailView
 
-from stepping_out.models import ScheduledDance, Dance, Venue
+from stepping_out.models import ScheduledDance, Dance, Location
 
 
 def _get_upcoming_dances(scheduled_dances):
@@ -80,12 +80,12 @@ class DanceDetailView(FakeSlugDetailMixin, DateDetailView):
                                             ).filter(sites=site)
 
 
-class VenueDetailView(FakeSlugDetailView):
-    model = Venue
+class LocationDetailView(FakeSlugDetailView):
+    model = Location
     context_object_name = 'venue'
 
     def get_context_data(self, **kwargs):
-        context = super(VenueDetailView, self).get_context_data(**kwargs)
+        context = super(LocationDetailView, self).get_context_data(**kwargs)
 
         dances = _get_upcoming_dances(self.object.scheduled_dances.all())
         dances = dances.filter(venue=self.object)

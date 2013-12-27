@@ -3,19 +3,19 @@
 {% load url from future %}{% load daguerre %}
 
 {% block main %}
-  {% include 'stepping_out/_banner.html' with banner=venue.banner %}
+  {% include 'stepping_out/_banner.html' with banner=location.banner %}
 
   <div class='pull-right info-box'>
-    <h3>{% if venue.neighborhood %}{{ venue.neighborhood }}, {% endif %}{{ venue.city }}, {{ venue.state }}</h3>
-    {% include "stepping_out/_venue_map.html" with venue=venue only %}
-    {% with scheduled_dances=venue.scheduled_dances.all %}
+    <h3>{% if location.neighborhood %}{{ location.neighborhood }}, {% endif %}{{ location.city }}, {{ location.state }}</h3>
+    {% include "stepping_out/_location_map.html" with location=location only %}
+    {% with scheduled_dances=location.scheduled_dances.all %}
       {% for scheduled_dance in scheduled_dances %}
         <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
       {% endfor %}
     {% endwith %}
   </div>
 
-  <h1>{{ venue.name }}{% if venue.website %} <small>{{ venue.website|urlize }}</small>{% endif %}</h1>
+  <h1>{{ location.name }}{% if location.website %} <small>{{ location.website|urlize }}</small>{% endif %}</h1>
 
   {% for day, dances in dances_grouped %}
     {% adjust_bulk dances 'banner' 'fill' width=64 height=64 as adjusted %}
