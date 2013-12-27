@@ -35,7 +35,7 @@ class ScheduledDanceAdmin(admin.ModelAdmin):
             'fields': ('name', 'banner', 'description', 'website', 'sites'),
         }),
         ('Scheduling', {
-            'fields': ('venue', 'start', 'end', 'weekday', 'weeks'),
+            'fields': ('venue', 'start', 'end', 'weekday', 'weeks', 'dance_template'),
         }),
         ('Pricing', {
             'fields': ('price', 'student_price', 'custom_price')

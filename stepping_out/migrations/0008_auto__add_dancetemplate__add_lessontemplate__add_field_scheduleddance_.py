@@ -8,22 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'LessonTemplate'
-        db.create_table(u'stepping_out_lessontemplate', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('price', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0)),
-            ('student_price', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
-            ('custom_price', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('dance_template', self.gf('django.db.models.fields.related.ForeignKey')(related_name='lesson_templates', to=orm['stepping_out.DanceTemplate'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('venue', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['stepping_out.Venue'], null=True, blank=True)),
-            ('start_time', self.gf('django.db.models.fields.TimeField')(null=True, blank=True)),
-            ('end_time', self.gf('django.db.models.fields.TimeField')(null=True, blank=True)),
-            ('dance_included', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'stepping_out', ['LessonTemplate'])
-
         # Adding model 'DanceTemplate'
         db.create_table(u'stepping_out_dancetemplate', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -48,16 +32,40 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(u'stepping_out_dancetemplate_sites', ['dancetemplate_id', 'site_id'])
 
+        # Adding model 'LessonTemplate'
+        db.create_table(u'stepping_out_lessontemplate', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('price', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0)),
+            ('student_price', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
+            ('custom_price', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
+            ('dance_template', self.gf('django.db.models.fields.related.ForeignKey')(related_name='lesson_templates', to=orm['stepping_out.DanceTemplate'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('venue', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['stepping_out.Venue'], null=True, blank=True)),
+            ('start_time', self.gf('django.db.models.fields.TimeField')(null=True, blank=True)),
+            ('end_time', self.gf('django.db.models.fields.TimeField')(null=True, blank=True)),
+            ('dance_included', self.gf('django.db.models.fields.BooleanField')(default=True)),
+        ))
+        db.send_create_signal(u'stepping_out', ['LessonTemplate'])
+
+        # Adding field 'ScheduledDance.dance_template'
+        db.add_column(u'stepping_out_scheduleddance', 'dance_template',
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['stepping_out.DanceTemplate'], null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        # Deleting model 'LessonTemplate'
-        db.delete_table(u'stepping_out_lessontemplate')
-
         # Deleting model 'DanceTemplate'
         db.delete_table(u'stepping_out_dancetemplate')
 
         # Removing M2M table for field sites on 'DanceTemplate'
         db.delete_table('stepping_out_dancetemplate_sites')
+
+        # Deleting model 'LessonTemplate'
+        db.delete_table(u'stepping_out_lessontemplate')
+
+        # Deleting field 'ScheduledDance.dance_template'
+        db.delete_column(u'stepping_out_scheduleddance', 'dance_template_id')
 
 
     models = {
@@ -205,6 +213,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ScheduledDance'},
             'banner': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'custom_price': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'dance_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['stepping_out.DanceTemplate']", 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'end': ('django.db.models.fields.TimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

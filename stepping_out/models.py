@@ -287,6 +287,7 @@ class ScheduledDance(BasePriceModel):
     weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES)
     weeks = models.CommaSeparatedIntegerField(max_length=len(WEEKLY),
                                               default=WEEKLY)
+    dance_template = models.ForeignKey('DanceTemplate', blank=True, null=True)
 
     # Deprecated/elsewhere.
     start = models.TimeField(blank=True, null=True)

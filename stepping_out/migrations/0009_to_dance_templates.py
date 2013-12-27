@@ -26,6 +26,8 @@ class Migration(DataMigration):
                 start_time=sd.start,
                 end_time=sd.end
             )
+            sd.dance_template = dt
+            sd.save()
             dt.sites = sd.sites.all()
             for sl in sd.scheduled_lessons.all():
                 lt = LessonTemplate.objects.create(
@@ -40,7 +42,6 @@ class Migration(DataMigration):
                     end_time=sl.end,
                     dance_included=sl.dance_included
                 )
-
 
     def backwards(self, orm):
         "Write your backwards methods here."
@@ -191,6 +192,7 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'ScheduledDance'},
             'banner': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'custom_price': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'dance_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['stepping_out.DanceTemplate']", 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'end': ('django.db.models.fields.TimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
