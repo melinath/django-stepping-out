@@ -257,7 +257,7 @@ class Lesson(BasePriceModel):
 
 class ScheduledDance(BasePriceModel):
     """
-    Overarching model for a weekly or biweekly dance.
+    Overarching model for a regularly-occuring dance venue.
 
     """
     # These choices match up with the datetime.date(time).weekday() method.
@@ -284,15 +284,17 @@ class ScheduledDance(BasePriceModel):
         blank=True)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
+    weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES)
+    weeks = models.CommaSeparatedIntegerField(max_length=len(WEEKLY),
+                                              default=WEEKLY)
+
+    # Deprecated/elsewhere.
+    start = models.TimeField(blank=True, null=True)
+    end = models.TimeField(blank=True, null=True)
     venue = models.ForeignKey(Venue,
                               blank=True,
                               null=True,
                               related_name='scheduled_dances')
-    weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES)
-    weeks = models.CommaSeparatedIntegerField(max_length=len(WEEKLY),
-                                              default=WEEKLY)
-    start = models.TimeField(blank=True, null=True)
-    end = models.TimeField(blank=True, null=True)
     sites = models.ManyToManyField(Site, blank=True)
 
     @models.permalink
@@ -435,3 +437,30 @@ class ScheduledLesson(BasePriceModel):
 
     def __unicode__(self):
         return u"{0} ({1})".format(self.name, self.scheduled_dance.name)
+
+
+class DanceTemplate(BasePriceModel):
+    name = models.CharField(max_length=100, blank=True)
+    tagline = models.CharField(max_length=100, blank=True)
+    banner = models.ImageField(
+        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
+        blank=True)
+    description = models.TextField(blank=True)
+    venue = models.ForeignKey(Venue, blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
+    sites = models.ManyToManyField(Site, blank=True)
+
+
+class LessonTemplate(BasePriceModel):
+    """
+    A lesson which will be created at the same time that a dance is created.
+    """
+    dance_template = models.ForeignKey(DanceTemplate,
+                                       related_name='lesson_templates')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    venue = models.ForeignKey(Venue, blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
+    dance_included = models.BooleanField(default=True)
