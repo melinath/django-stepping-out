@@ -236,10 +236,6 @@ class Lesson(BasePriceModel):
     venue = models.ForeignKey(Venue, blank=True, null=True)
     teachers = models.ManyToManyField(Person, blank=True)
     dance = models.ForeignKey(Dance, related_name='lessons')
-    scheduled_lesson = models.ForeignKey('ScheduledLesson',
-                                         blank=True,
-                                         null=True,
-                                         related_name='lessons')
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
@@ -255,7 +251,118 @@ class Lesson(BasePriceModel):
                                         start.strftime("%Y-%m-%d"))
 
 
-class ScheduledDance(BasePriceModel):
+class DanceTemplate(BasePriceModel):
+    name = models.CharField(max_length=100, blank=True)
+    tagline = models.CharField(max_length=100, blank=True)
+    banner = models.ImageField(
+        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
+        blank=True)
+    description = models.TextField(blank=True)
+    venue = models.ForeignKey(Venue, blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
+    sites = models.ManyToManyField(Site, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def get_or_create_dance(self, start_day):
+        tzinfo = get_current_timezone()
+        start = make_aware(datetime.datetime.combine(start_day, self.start),
+                           tzinfo)
+        end = make_aware(datetime.datetime.combine(start_day, self.end),
+                         tzinfo)
+        if end < start:
+            # Then it ends the next day.
+            end = end + datetime.timedelta(1)
+
+        defaults = {
+            'name': self.name,
+            'banner': self.banner,
+            'description': self.description,
+            'venue': self.venue,
+            'price': self.price,
+            'student_price': self.student_price,
+            'custom_price': self.custom_price,
+            'start': start,
+            'end': end,
+        }
+        utc_start = start.astimezone(utc)
+        kwargs = {
+            'start__year': utc_start.year,
+            'start__month': utc_start.month,
+            'start__day': utc_start.day,
+            'scheduled_dance': self
+        }
+        dance, created = Dance.objects.get_or_create(defaults=defaults,
+                                                     **kwargs)
+        if created:
+            dance.sites = self.sites.all()
+            for lesson_template in self.lesson_templates.all():
+                lesson_template.get_or_create_lesson(dance)
+        return dance, created
+
+
+class LessonTemplate(BasePriceModel):
+    """
+    A lesson which will be created at the same time that a dance is created.
+    """
+    dance_template = models.ForeignKey(DanceTemplate,
+                                       related_name='lesson_templates',
+                                       blank=True, null=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    venue = models.ForeignKey(Venue, blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
+    dance_included = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        if self.dance_template:
+            return u"{0} ({1})".format(self.name, self.dance_template.name)
+        return self.name
+
+    def get_or_create_lesson(self, dance):
+        """
+        Gets or creates a lesson for the given Dance object.
+
+        :raises: ValueError if the dance's scheduled dance is not the same
+                 as the lesson's scheduled dance.
+
+        """
+        tzinfo = get_current_timezone()
+        start_day = dance.start.astimezone(tzinfo).date()
+        start = make_aware(datetime.datetime.combine(start_day, self.start_time),
+                           tzinfo)
+        end = make_aware(datetime.datetime.combine(start_day, self.end_time),
+                         tzinfo)
+        if end < start:
+            # Then it ends the next day.
+            end = end + datetime.timedelta(1)
+
+        defaults = {
+            'name': self.name,
+            'description': self.description,
+            'venue': self.venue,
+            'price': self.price,
+            'student_price': self.student_price,
+            'custom_price': self.custom_price,
+            'start': start,
+            'end': end,
+            'dance_included': self.dance_included,
+            'dance': dance
+        }
+        utc_start = start.astimezone(utc)
+        kwargs = {
+            'start__year': utc_start.year,
+            'start__month': utc_start.month,
+            'start__day': utc_start.day,
+        }
+        return Lesson.objects.get_or_create(defaults=defaults,
+                                            **kwargs)
+
+
+class ScheduledDance(models.Model):
     """
     Overarching model for a regularly-occuring dance venue.
 
@@ -288,15 +395,6 @@ class ScheduledDance(BasePriceModel):
     weeks = models.CommaSeparatedIntegerField(max_length=len(WEEKLY),
                                               default=WEEKLY)
     dance_template = models.ForeignKey('DanceTemplate', blank=True, null=True)
-
-    # Deprecated/elsewhere.
-    start = models.TimeField(blank=True, null=True)
-    end = models.TimeField(blank=True, null=True)
-    venue = models.ForeignKey(Venue,
-                              blank=True,
-                              null=True,
-                              related_name='scheduled_dances')
-    sites = models.ManyToManyField(Site, blank=True)
 
     @models.permalink
     def get_absolute_url(self):
@@ -339,129 +437,3 @@ class ScheduledDance(BasePriceModel):
                     return day
 
         raise ValueError("No next date found.")
-
-    def get_or_create_dance(self, start_day):
-        tzinfo = get_current_timezone()
-        start = make_aware(datetime.datetime.combine(start_day, self.start),
-                           tzinfo)
-        end = make_aware(datetime.datetime.combine(start_day, self.end),
-                         tzinfo)
-        if end < start:
-            # Then it ends the next day.
-            end = end + datetime.timedelta(1)
-
-        defaults = {
-            'name': self.name,
-            'banner': self.banner,
-            'description': self.description,
-            'venue': self.venue,
-            'price': self.price,
-            'student_price': self.student_price,
-            'custom_price': self.custom_price,
-            'start': start,
-            'end': end,
-        }
-        utc_start = start.astimezone(utc)
-        kwargs = {
-            'start__year': utc_start.year,
-            'start__month': utc_start.month,
-            'start__day': utc_start.day,
-            'scheduled_dance': self
-        }
-        dance, created = Dance.objects.get_or_create(defaults=defaults,
-                                                     **kwargs)
-        if created:
-            dance.sites = self.sites.all()
-            for scheduled_lesson in self.scheduled_lessons.all():
-                scheduled_lesson.get_or_create_lesson(dance)
-        return dance, created
-
-    def get_or_create_next_dance(self):
-        return self.get_or_create_dance(self.get_next_date())
-
-
-class ScheduledLesson(BasePriceModel):
-    """
-    A lesson attached to a scheduled dance.
-
-    """
-    scheduled_dance = models.ForeignKey(ScheduledDance,
-                                        related_name='scheduled_lessons')
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
-    start = models.TimeField(blank=True, null=True)
-    end = models.TimeField(blank=True, null=True)
-    dance_included = models.BooleanField(default=True)
-
-    def get_or_create_lesson(self, dance):
-        """
-        Gets or creates a lesson for the given dance.
-
-        :raises: ValueError if the dance's scheduled dance is not the same
-                 as the lesson's scheduled dance.
-
-        """
-        if dance.scheduled_dance_id != self.scheduled_dance_id:
-            raise ValueError
-        tzinfo = get_current_timezone()
-        start_day = dance.start.astimezone(tzinfo).date()
-        start = make_aware(datetime.datetime.combine(start_day, self.start),
-                           tzinfo)
-        end = make_aware(datetime.datetime.combine(start_day, self.end),
-                         tzinfo)
-        if end < start:
-            # Then it ends the next day.
-            end = end + datetime.timedelta(1)
-
-        defaults = {
-            'name': self.name,
-            'description': self.description,
-            'venue': self.venue,
-            'price': self.price,
-            'student_price': self.student_price,
-            'custom_price': self.custom_price,
-            'start': start,
-            'end': end,
-            'dance_included': self.dance_included,
-            'dance': dance
-        }
-        utc_start = start.astimezone(utc)
-        kwargs = {
-            'start__year': utc_start.year,
-            'start__month': utc_start.month,
-            'start__day': utc_start.day,
-            'scheduled_lesson': self
-        }
-        return Lesson.objects.get_or_create(defaults=defaults,
-                                            **kwargs)
-
-    def __unicode__(self):
-        return u"{0} ({1})".format(self.name, self.scheduled_dance.name)
-
-
-class DanceTemplate(BasePriceModel):
-    name = models.CharField(max_length=100, blank=True)
-    tagline = models.CharField(max_length=100, blank=True)
-    banner = models.ImageField(
-        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
-        blank=True)
-    description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
-    start_time = models.TimeField(blank=True, null=True)
-    end_time = models.TimeField(blank=True, null=True)
-    sites = models.ManyToManyField(Site, blank=True)
-
-
-class LessonTemplate(BasePriceModel):
-    """
-    A lesson which will be created at the same time that a dance is created.
-    """
-    dance_template = models.ForeignKey(DanceTemplate,
-                                       related_name='lesson_templates')
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    venue = models.ForeignKey(Venue, blank=True, null=True)
-    start_time = models.TimeField(blank=True, null=True)
-    end_time = models.TimeField(blank=True, null=True)
-    dance_included = models.BooleanField(default=True)

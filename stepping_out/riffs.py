@@ -1,14 +1,10 @@
 from djam.riffs.models import ModelRiff
 
-from stepping_out.models import ScheduledLesson, Lesson
-
-
-class ScheduledLessonRiff(ModelRiff):
-    model = ScheduledLesson
+from stepping_out.models import Lesson
 
 
 class LessonRiff(ModelRiff):
     model = Lesson
 
 
-riffs = [ScheduledLessonRiff, LessonRiff]
+riffs = [LessonRiff]

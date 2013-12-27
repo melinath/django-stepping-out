@@ -6,45 +6,24 @@ from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
 from stepping_out.forms import ScheduledDanceForm, VenueForm, DanceCreateForm
-from stepping_out.models import (ScheduledLesson, ScheduledDance,
+from stepping_out.models import (ScheduledDance,
                                  Venue, Dance, Lesson, Person, DanceDJ,
                                  DanceLiveAct, DanceTemplate, LessonTemplate)
-
-
-class ScheduledLessonInline(admin.StackedInline):
-    model = ScheduledLesson
-    fieldsets = (
-        (None, {
-            'fields': ('name', 'description'),
-        }),
-        ('Scheduling', {
-            'fields': ('venue', 'start', 'end', 'scheduled_dance'),
-        }),
-        ('Pricing', {
-            'fields': ('price', 'student_price', 'custom_price',
-                       'dance_included')
-        })
-    )
-    extra = 1
 
 
 class ScheduledDanceAdmin(admin.ModelAdmin):
     form = ScheduledDanceForm
     fieldsets = (
         (None, {
-            'fields': ('name', 'banner', 'description', 'website', 'sites'),
+            'fields': ('name', 'banner', 'description', 'website'),
         }),
         ('Scheduling', {
-            'fields': ('venue', 'start', 'end', 'weekday', 'weeks', 'dance_template'),
+            'fields': ('weekday', 'weeks', 'dance_template'),
         }),
-        ('Pricing', {
-            'fields': ('price', 'student_price', 'custom_price')
-        })
     )
-    inlines = [ScheduledLessonInline]
     actions = ['create_next_dances']
-    list_display = ['name', 'venue', 'start', 'get_schedule']
-    list_filter = ['venue', 'weekday']
+    list_display = ['name', 'get_schedule']
+    list_filter = ['weekday']
 
     def get_schedule(self, obj):
         return render_to_string('stepping_out/scheduleddance/_schedule.html',
