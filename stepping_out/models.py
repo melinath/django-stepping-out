@@ -205,6 +205,10 @@ class Dance(BasePriceModel):
     is_canceled = models.BooleanField(default=False)
     sites = models.ManyToManyField(Site, blank=True)
 
+    # This field is used internally for recurring events to track when
+    # a single instance is modified.
+    original_day = models.DateField(blank=True, null=True)
+
     class Meta:
         ordering = ('start', 'end')
 
@@ -235,10 +239,15 @@ class Lesson(BasePriceModel):
     description = models.TextField(blank=True)
     location = models.ForeignKey(Location, blank=True, null=True)
     teachers = models.ManyToManyField(Person, blank=True)
-    dance = models.ForeignKey(Dance, related_name='lessons')
+    dance = models.ForeignKey(Dance, related_name='lessons', blank=True, null=True)
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
+    series = models.ForeignKey('Series', blank=True, null=True)
+
+    # This field is used internally for recurring events to track when
+    # a single instance is modified.
+    original_day = models.DateField(blank=True, null=True)
 
     class Meta:
         ordering = ('start', 'end')
@@ -266,11 +275,11 @@ class DanceTemplate(BasePriceModel):
     def __unicode__(self):
         return self.name
 
-    def get_or_create_dance(self, start_day):
+    def get_or_create_dance(self, start_day, venue=None):
         tzinfo = get_current_timezone()
-        start = make_aware(datetime.datetime.combine(start_day, self.start),
+        start = make_aware(datetime.datetime.combine(start_day, self.start_time),
                            tzinfo)
-        end = make_aware(datetime.datetime.combine(start_day, self.end),
+        end = make_aware(datetime.datetime.combine(start_day, self.end_time),
                          tzinfo)
         if end < start:
             # Then it ends the next day.
@@ -286,20 +295,24 @@ class DanceTemplate(BasePriceModel):
             'custom_price': self.custom_price,
             'start': start,
             'end': end,
+            'original_day': start_day
         }
-        utc_start = start.astimezone(utc)
-        kwargs = {
-            'start__year': utc_start.year,
-            'start__month': utc_start.month,
-            'start__day': utc_start.day,
-            'venue': self
-        }
-        dance, created = Dance.objects.get_or_create(defaults=defaults,
-                                                     **kwargs)
+        if venue is not None:
+            kwargs = {
+                'original_day__year': start_day.year,
+                'original_day__month': start_day.month,
+                'original_day__day': start_day.day,
+                'venue': venue,
+            }
+            dance, created = Dance.objects.get_or_create(defaults=defaults,
+                                                         **kwargs)
+        else:
+            created = True
+            dance = Dance.objects.create(**defaults)
         if created:
             dance.sites = self.sites.all()
             for lesson_template in self.lesson_templates.all():
-                lesson_template.get_or_create_lesson(dance)
+                lesson_template.get_or_create_lesson(start_day, dance)
         return dance, created
 
 
@@ -322,16 +335,12 @@ class LessonTemplate(BasePriceModel):
             return u"{0} ({1})".format(self.name, self.dance_template.name)
         return self.name
 
-    def get_or_create_lesson(self, dance):
+    def get_or_create_lesson(self, start_day, dance=None, series=None):
         """
-        Gets or creates a lesson for the given Dance object.
-
-        :raises: ValueError if the dance's scheduled dance is not the same
-                 as the lesson's scheduled dance.
+        Gets or creates a lesson for the given Dance object and/or Series.
 
         """
         tzinfo = get_current_timezone()
-        start_day = dance.start.astimezone(tzinfo).date()
         start = make_aware(datetime.datetime.combine(start_day, self.start_time),
                            tzinfo)
         end = make_aware(datetime.datetime.combine(start_day, self.end_time),
@@ -350,23 +359,22 @@ class LessonTemplate(BasePriceModel):
             'start': start,
             'end': end,
             'dance_included': self.dance_included,
-            'dance': dance
+            'dance': dance,
+            'original_day': start_day,
         }
-        utc_start = start.astimezone(utc)
-        kwargs = {
-            'start__year': utc_start.year,
-            'start__month': utc_start.month,
-            'start__day': utc_start.day,
-        }
-        return Lesson.objects.get_or_create(defaults=defaults,
-                                            **kwargs)
+        if series is not None:
+            kwargs = {
+                'original_day__year': start_day.year,
+                'original_day__month': start_day.month,
+                'original_day__day': start_day.day,
+            }
+            return Lesson.objects.get_or_create(defaults=defaults,
+                                                **kwargs)
+        else:
+            return Lesson.objects.create(**defaults), True
 
 
-class Venue(models.Model):
-    """
-    Model for a regularly-occuring dance venue.
-
-    """
+class ScheduleBase(models.Model):
     # These choices match up with the datetime.date(time).weekday() method.
     WEEKDAY_CHOICES = (
         (0, _('Monday')),
@@ -385,24 +393,14 @@ class Venue(models.Model):
         (5, _('Fifth')),
     )
     WEEKLY = '1,2,3,4,5'
-    name = models.CharField(max_length=100)
-    banner = models.ImageField(
-        upload_to="stepping_out/venue/banner/%Y/%m/%d",
-        blank=True)
-    description = models.TextField(blank=True)
-    website = models.URLField(blank=True)
     weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES)
     weeks = models.CommaSeparatedIntegerField(max_length=len(WEEKLY),
                                               default=WEEKLY)
-    dance_template = models.ForeignKey('DanceTemplate', blank=True, null=True)
+    start_day = models.DateField(blank=True, null=True)
+    end_day = models.DateField(blank=True, null=True)
 
-    @models.permalink
-    def get_absolute_url(self):
-        return ('stepping_out_venue_detail', (),
-                {'pk': self.pk, 'slug': slugify(self.name)})
-
-    def __unicode__(self):
-        return self.name
+    class Meta:
+        abstract = True
 
     def get_weeks(self):
         return [week[1] for week in self.WEEK_CHOICES
@@ -437,3 +435,41 @@ class Venue(models.Model):
                     return day
 
         raise ValueError("No next date found.")
+
+
+class Venue(ScheduleBase):
+    """
+    Model for a regularly-occuring dance venue.
+
+    """
+    name = models.CharField(max_length=100)
+    banner = models.ImageField(
+        upload_to="stepping_out/venue/banner/%Y/%m/%d",
+        blank=True)
+    description = models.TextField(blank=True)
+    website = models.URLField(blank=True)
+    dance_template = models.ForeignKey(DanceTemplate, blank=True, null=True)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('stepping_out_venue_detail', (),
+                {'pk': self.pk, 'slug': slugify(self.name)})
+
+    def __unicode__(self):
+        return self.name
+
+
+class Series(ScheduleBase):
+    """
+    Model for a recurring lesson series.
+
+    """
+    name = models.CharField(max_length=100)
+    banner = models.ImageField(
+        upload_to="stepping_out/venue/banner/%Y/%m/%d",
+        blank=True)
+    description = models.TextField(blank=True)
+    lesson_template = models.ForeignKey(LessonTemplate, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name

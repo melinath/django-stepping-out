@@ -2,7 +2,8 @@ from django.core.exceptions import ValidationError
 import floppyforms as forms
 from pygeocoder import Geocoder
 
-from stepping_out.models import Venue, Location, Dance
+from stepping_out.models import (Venue, Location, Dance, DanceTemplate,
+                                 Lesson, LessonTemplate)
 
 
 class VenueForm(forms.ModelForm):
@@ -59,14 +60,45 @@ class LocationForm(forms.ModelForm):
 
 class DanceCreateForm(forms.ModelForm):
     start_day = forms.DateField()
+    template = forms.ModelChoiceField(DanceTemplate.objects.all(),
+                                      required=False)
 
     class Meta:
         model = Dance
-        fields = ('scheduled_dance',)
+        fields = ('venue',)
 
     def save(self, **kwargs):
-        scheduled_dance = self.instance.scheduled_dance
-        if not scheduled_dance:
-            return super(DanceCreateForm, self).save(**kwargs)
         start_day = self.cleaned_data['start_day']
-        return scheduled_dance.get_or_create_dance(start_day)[0]
+        template = self.cleaned_data['template']
+        venue = self.instance.venue
+
+        if not template and venue and venue.dance_template:
+            template = venue.dance_template
+
+        if template:
+            return template.get_or_create_dance(start_day, venue)[0]
+
+        return super(DanceCreateForm, self).save(**kwargs)
+
+
+class LessonCreateForm(forms.ModelForm):
+    start_day = forms.DateField()
+    template = forms.ModelChoiceField(LessonTemplate.objects.all(),
+                                      required=False)
+
+    class Meta:
+        model = Lesson
+        fields = ('series',)
+
+    def save(self, **kwargs):
+        start_day = self.cleaned_data['start_day']
+        template = self.cleaned_data['template']
+        series = self.instance.series
+
+        if not template and series and series.lesson_template:
+            template = series.lesson_template
+
+        if template:
+            return template.get_or_create_dance(start_day, series)[0]
+
+        return super(DanceCreateForm, self).save(**kwargs)

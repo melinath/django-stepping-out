@@ -1,8 +1,6 @@
 from daguerre.widgets import AreaWidget
-from django.core.urlresolvers import reverse
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.db import models
-from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
 from stepping_out.forms import VenueForm, LocationForm, DanceCreateForm
@@ -21,7 +19,6 @@ class VenueAdmin(admin.ModelAdmin):
             'fields': ('weekday', 'weeks', 'dance_template'),
         }),
     )
-    actions = ['create_next_dances']
     list_display = ['name', 'get_schedule']
     list_filter = ['weekday']
 
@@ -29,22 +26,6 @@ class VenueAdmin(admin.ModelAdmin):
         return render_to_string('stepping_out/scheduleddance/_schedule.html',
                                 {'scheduled_dance': obj})
     get_schedule.short_description = 'Schedule'
-
-    def create_next_dances(self, request, queryset):
-        for scheduled_dance in queryset:
-            dance, created = scheduled_dance.get_or_create_next_dance()
-            url = reverse('admin:stepping_out_dance_change', args=(dance.pk,))
-            if created:
-                message = u"Created {0}".format(dance)
-                level = messages.success
-            else:
-                message = u"{0} already exists".format(dance)
-                level = messages.info
-            if len(queryset) > 1:
-                message = u"{0}: {1}".format(message, url)
-            level(request, message)
-        if len(queryset) == 1:
-            return HttpResponseRedirect(url)
 
 
 class LessonTemplateInline(admin.StackedInline):
@@ -142,7 +123,7 @@ class DanceAdmin(admin.ModelAdmin):
     add_form = DanceCreateForm
     add_fieldsets = (
         (None, {
-            'fields': ('venue', 'start_day'),
+            'fields': ('venue', 'template', 'start_day'),
         }),
     )
 
