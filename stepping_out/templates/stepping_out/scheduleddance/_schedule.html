@@ -1,9 +1,9 @@
-{# expects a scheduled_dance and (optionally) include_time #}
-{% with weeks=scheduled_dance.get_weeks %}
+{# expects a venue and (optionally) include_time #}
+{% with weeks=venue.get_weeks %}
     {% if weeks|length == 5 %}
-    Every {{ scheduled_dance.get_weekday_display }}{% else %}
+    Every {{ venue.get_weekday_display }}{% else %}
     {% filter capfirst %}{% for week in weeks %}{% if forloop.last and not forloop.first %} and {% endif %}{{ week|lower }}{% if weeks|length > 2 and not forloop.last %}, {% endif %}{% endfor %}
     {% endfilter %}
-    {{ scheduled_dance.get_weekday_display }}{{ weeks|pluralize }}{% endif %}{% if include_time and scheduled_dance.start and scheduled_dance.end %},
-    <time datetime="{{ scheduled_dance.start|date:'H:i' }}">{{ scheduled_dance.start|date:'g:i a' }}</time> – <time datetime="{{ scheduled_dance.end|date:'H:i' }}">{{ scheduled_dance.end|date:'g:i a' }}</time>{% else %}{% endif %}
+    {{ venue.get_weekday_display }}{{ weeks|pluralize }}{% endif %}{% if include_time and venue.start and venue.end %},
+    <time datetime="{{ venue.start|date:'H:i' }}">{{ venue.start|date:'g:i a' }}</time> – <time datetime="{{ venue.end|date:'H:i' }}">{{ venue.end|date:'g:i a' }}</time>{% else %}{% endif %}
 {% endwith %}

@@ -74,7 +74,7 @@
     </div>
 
     <div class='col-xs-12 col-xs-pull-12 col-sm-4 col-sm-pull-0'>
-      {% with location=dance.location scheduled_dance=dance.scheduled_dance %}
+      {% with location=dance.location venue=dance.venue %}
         {% if location %}
           {% include "stepping_out/_location_map.html" with location=location only %}
           <h4>
@@ -82,12 +82,12 @@
           {% if location.website %}<small>({{ location.website|urlize }})</small>{% endif %}
           </h4>
         {% endif %}
-        {% if scheduled_dance %}
-          <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
+        {% if venue %}
+          <h4><a href='{{ venue.get_absolute_url }}'>{{ venue.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with venue=venue %}</a></h4>
         {% endif %}
-        {% if scheduled_dances %}
-          {% for scheduled_dance in scheduled_dances %}
-            <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
+        {% if venues %}
+          {% for venue in venues %}
+            <h4><a href='{{ venue.get_absolute_url }}'>{{ venue.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with venue=venue %}</a></h4>
           {% endfor %}
         {% endif %}
       {% endwith %}

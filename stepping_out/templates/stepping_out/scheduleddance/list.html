@@ -3,8 +3,8 @@
 {% load url from future %}
 
 {% block main %}
-  {% for dance in scheduled_dances %}
-    <h3><a href="{% url 'stepping_out_scheduled_dance_detail' pk=dance.pk slug=dance.name|slugify %}">{{ dance.name }}</a>{% if dance.location %} <small>at <a href="{% url 'stepping_out_location_detail' pk=dance.location.pk slug=dance.location.name|slugify %}">{{ dance.location.name }}</a></small>{% endif %}</h3>
+  {% for dance in venues %}
+    <h3><a href="{% url 'stepping_out_venue_detail' pk=dance.pk slug=dance.name|slugify %}">{{ dance.name }}</a>{% if dance.location %} <small>at <a href="{% url 'stepping_out_location_detail' pk=dance.location.pk slug=dance.location.name|slugify %}">{{ dance.location.name }}</a></small>{% endif %}</h3>
     <div class="row">
       <div class="col-md-6">
         <h4>

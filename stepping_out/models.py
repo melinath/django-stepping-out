@@ -196,10 +196,10 @@ class Dance(BasePriceModel):
     live_acts = models.ManyToManyField(LiveAct,
                                        through=DanceLiveAct,
                                        blank=True)
-    scheduled_dance = models.ForeignKey('ScheduledDance',
-                                        blank=True,
-                                        null=True,
-                                        related_name='dances')
+    venue = models.ForeignKey('Venue',
+                              blank=True,
+                              null=True,
+                              related_name='dances')
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     is_canceled = models.BooleanField(default=False)
@@ -255,7 +255,7 @@ class DanceTemplate(BasePriceModel):
     name = models.CharField(max_length=100, blank=True)
     tagline = models.CharField(max_length=100, blank=True)
     banner = models.ImageField(
-        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
+        upload_to="stepping_out/dance/banner/%Y/%m/%d",
         blank=True)
     description = models.TextField(blank=True)
     location = models.ForeignKey(Location, blank=True, null=True)
@@ -292,7 +292,7 @@ class DanceTemplate(BasePriceModel):
             'start__year': utc_start.year,
             'start__month': utc_start.month,
             'start__day': utc_start.day,
-            'scheduled_dance': self
+            'venue': self
         }
         dance, created = Dance.objects.get_or_create(defaults=defaults,
                                                      **kwargs)
@@ -362,9 +362,9 @@ class LessonTemplate(BasePriceModel):
                                             **kwargs)
 
 
-class ScheduledDance(models.Model):
+class Venue(models.Model):
     """
-    Overarching model for a regularly-occuring dance venue.
+    Model for a regularly-occuring dance venue.
 
     """
     # These choices match up with the datetime.date(time).weekday() method.
@@ -387,7 +387,7 @@ class ScheduledDance(models.Model):
     WEEKLY = '1,2,3,4,5'
     name = models.CharField(max_length=100)
     banner = models.ImageField(
-        upload_to="stepping_out/scheduled_dance/banner/%Y/%m/%d",
+        upload_to="stepping_out/venue/banner/%Y/%m/%d",
         blank=True)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
@@ -398,7 +398,7 @@ class ScheduledDance(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('stepping_out_scheduled_dance_detail', (),
+        return ('stepping_out_venue_detail', (),
                 {'pk': self.pk, 'slug': slugify(self.name)})
 
     def __unicode__(self):

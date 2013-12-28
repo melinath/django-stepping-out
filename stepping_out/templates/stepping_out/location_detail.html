@@ -8,9 +8,9 @@
   <div class='pull-right info-box'>
     <h3>{% if location.neighborhood %}{{ location.neighborhood }}, {% endif %}{{ location.city }}, {{ location.state }}</h3>
     {% include "stepping_out/_location_map.html" with location=location only %}
-    {% with scheduled_dances=location.scheduled_dances.all %}
-      {% for scheduled_dance in scheduled_dances %}
-        <h4><a href='{{ scheduled_dance.get_absolute_url }}'>{{ scheduled_dance.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance %}</a></h4>
+    {% with venues=location.venues.all %}
+      {% for venue in venues %}
+        <h4><a href='{{ venue.get_absolute_url }}'>{{ venue.name }}, {% include 'stepping_out/scheduleddance/_schedule.html' with venue=venue %}</a></h4>
       {% endfor %}
     {% endwith %}
   </div>

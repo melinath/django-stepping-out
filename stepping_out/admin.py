@@ -5,14 +5,14 @@ from django.db import models
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
-from stepping_out.forms import ScheduledDanceForm, LocationForm, DanceCreateForm
-from stepping_out.models import (ScheduledDance,
+from stepping_out.forms import VenueForm, LocationForm, DanceCreateForm
+from stepping_out.models import (Venue,
                                  Location, Dance, Lesson, Person, DanceDJ,
                                  DanceLiveAct, DanceTemplate, LessonTemplate)
 
 
-class ScheduledDanceAdmin(admin.ModelAdmin):
-    form = ScheduledDanceForm
+class VenueAdmin(admin.ModelAdmin):
+    form = VenueForm
     fieldsets = (
         (None, {
             'fields': ('name', 'banner', 'description', 'website'),
@@ -77,7 +77,6 @@ class DanceTemplateAdmin(admin.ModelAdmin):
         })
     )
     inlines = [LessonTemplateInline]
-    #actions = ['create_next_dances']
     list_display = ['name', 'location', 'start_time'] #, 'get_schedule']
     list_filter = ['location',]
 
@@ -85,22 +84,6 @@ class DanceTemplateAdmin(admin.ModelAdmin):
         return render_to_string('stepping_out/scheduleddance/_schedule.html',
                                 {'scheduled_dance': obj})
     get_schedule.short_description = 'Schedule'
-
-    def create_next_dances(self, request, queryset):
-        for scheduled_dance in queryset:
-            dance, created = scheduled_dance.get_or_create_next_dance()
-            url = reverse('admin:stepping_out_dance_change', args=(dance.pk,))
-            if created:
-                message = u"Created {0}".format(dance)
-                level = messages.success
-            else:
-                message = u"{0} already exists".format(dance)
-                level = messages.info
-            if len(queryset) > 1:
-                message = u"{0}: {1}".format(message, url)
-            level(request, message)
-        if len(queryset) == 1:
-            return HttpResponseRedirect(url)
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -138,7 +121,7 @@ class DanceAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('name', 'tagline', 'banner', 'description',
-                       'scheduled_dance', 'sites'),
+                       'venue', 'sites'),
         }),
         ('Scheduling', {
             'fields': ('is_canceled', 'location', 'start', 'end', 'hosts'),
@@ -149,8 +132,8 @@ class DanceAdmin(admin.ModelAdmin):
     )
     inlines = [LessonInline, DanceDJInline]
     filter_horizontal = ('hosts',)
-    list_display = ['name', 'start', 'location', 'scheduled_dance']
-    list_filter = ['is_canceled', 'location', 'scheduled_dance']
+    list_display = ['name', 'start', 'location', 'venue']
+    list_filter = ['is_canceled', 'location', 'venue']
     date_hierarchy = 'start'
     ordering = ('-start',)
     list_per_page = 20
@@ -159,7 +142,7 @@ class DanceAdmin(admin.ModelAdmin):
     add_form = DanceCreateForm
     add_fieldsets = (
         (None, {
-            'fields': ('scheduled_dance', 'start_day'),
+            'fields': ('venue', 'start_day'),
         }),
     )
 
@@ -172,7 +155,7 @@ class PersonAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
-admin.site.register(ScheduledDance, ScheduledDanceAdmin)
+admin.site.register(Venue, VenueAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Dance, DanceAdmin)
 admin.site.register(Person, PersonAdmin)

@@ -6,11 +6,11 @@ from django.utils.datastructures import SortedDict
 from django.utils.timezone import get_current_timezone, utc, now
 from django.views.generic import DetailView, ListView, DateDetailView
 
-from stepping_out.models import ScheduledDance, Dance, Location
+from stepping_out.models import Venue, Dance, Location
 
 
-def _get_upcoming_dances(scheduled_dances):
-    for sd in scheduled_dances:
+def _get_upcoming_dances(venues):
+    for sd in venues:
         sd.get_or_create_next_dance()
 
     # Return dances that end more than half an hour from now or start less
@@ -40,7 +40,7 @@ class UpcomingDancesView(ListView):
 
     def get_queryset(self):
         site = Site.objects.get_current()
-        scheduled = ScheduledDance.objects.filter(sites=site)
+        scheduled = Venue.objects.filter(sites=site)
         return _get_upcoming_dances(scheduled)
 
     def get_context_data(self, **kwargs):
@@ -76,7 +76,7 @@ class DanceDetailView(FakeSlugDetailMixin, DateDetailView):
 
     def get_queryset(self):
         site = Site.objects.get_current()
-        return Dance.objects.select_related('venue', 'scheduled_dance'
+        return Dance.objects.select_related('venue', 'venue'
                                             ).filter(sites=site)
 
 
@@ -87,7 +87,7 @@ class LocationDetailView(FakeSlugDetailView):
     def get_context_data(self, **kwargs):
         context = super(LocationDetailView, self).get_context_data(**kwargs)
 
-        dances = _get_upcoming_dances(self.object.scheduled_dances.all())
+        dances = _get_upcoming_dances(self.object.venues.all())
         dances = dances.filter(venue=self.object)
         dances_grouped = _group_dances(dances)
 
@@ -98,19 +98,19 @@ class LocationDetailView(FakeSlugDetailView):
         return context
 
 
-class ScheduledDanceDetailView(FakeSlugDetailMixin, DetailView):
-    model = ScheduledDance
-    context_object_name = 'scheduled_dance'
+class VenueDetailView(FakeSlugDetailMixin, DetailView):
+    model = Venue
+    context_object_name = 'venue'
 
     def get_queryset(self):
-        qs = super(ScheduledDanceDetailView, self).get_queryset()
+        qs = super(VenueDetailView, self).get_queryset()
         return qs.filter(sites=Site.objects.get_current())
 
     def get_context_data(self, **kwargs):
-        context = super(ScheduledDanceDetailView, self).get_context_data(**kwargs)
+        context = super(VenueDetailView, self).get_context_data(**kwargs)
 
         dances = _get_upcoming_dances([self.object])
-        dances = dances.filter(scheduled_dance=self.object)
+        dances = dances.filter(venue=self.object)
         dances_grouped = _group_dances(dances)
 
         context.update({

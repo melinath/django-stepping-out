@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
 from django.views.generic import ListView
 
-from stepping_out.models import ScheduledDance, Location, Person, LiveAct
-from stepping_out.views import (ScheduledDanceDetailView, UpcomingDancesView,
+from stepping_out.models import Venue, Location, Person, LiveAct
+from stepping_out.views import (VenueDetailView, UpcomingDancesView,
                                 FakeSlugDetailView, DanceDetailView,
                                 LocationDetailView)
 
@@ -16,14 +16,14 @@ urlpatterns = patterns('',
         DanceDetailView.as_view(month_format='%m'),
         name='stepping_out_dance_detail'),
 
-    url(r'^scheduled-dances/$',
-        ListView.as_view(queryset=ScheduledDance.objects.order_by('name'),
+    url(r'^venues/$',
+        ListView.as_view(queryset=Venue.objects.order_by('name'),
                          template_name='stepping_out/scheduleddance/list.html',
-                         context_object_name='scheduled_dances'),
-        name='stepping_out_scheduled_dances'),
-    url(r'^scheduled-dances/(?P<pk>\d+)/(?:(?P<slug>[\w-]+)/)?$',
-        ScheduledDanceDetailView.as_view(template_name='stepping_out/scheduleddance/detail.html'),
-        name='stepping_out_scheduled_dance_detail'),
+                         context_object_name='venues'),
+        name='stepping_out_venues'),
+    url(r'^venues/(?P<pk>\d+)/(?:(?P<slug>[\w-]+)/)?$',
+        VenueDetailView.as_view(template_name='stepping_out/scheduleddance/detail.html'),
+        name='stepping_out_venue_detail'),
 
     url(r'^locations/$',
         ListView.as_view(queryset=Location.objects.order_by('name'),

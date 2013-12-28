@@ -4,15 +4,15 @@
 
 {% block main %}
   {# put 'about' in info box and just have feed on the left. #}
-  {% include 'stepping_out/_banner.html' with banner=scheduled_dance.banner %}
+  {% include 'stepping_out/_banner.html' with banner=venue.banner %}
 
   <div class='pull-right info-box'>
-    <h3>{% include 'stepping_out/scheduleddance/_schedule.html' with scheduled_dance=scheduled_dance only %}</h3>
+    <h3>{% include 'stepping_out/scheduleddance/_schedule.html' with venue=venue only %}</h3>
 
-    {{ scheduled_dance.description|markdown }}
+    {{ venue.description|markdown }}
 
     <dl>
-      {% with lessons=scheduled_dance.scheduled_lessons.all %}
+      {% with lessons=venue.scheduled_lessons.all %}
         {% if lessons %}
           {% for lesson in lessons %}
             <dt>{{ lesson.name }}</dt>
@@ -23,10 +23,10 @@
       {% endwith %}
 
       <dt>Dance</dt>
-      <dd>{% include 'stepping_out/_times.html' with start=scheduled_dance.start end=scheduled_dance.end datetime_format='H:i' only %}</dd>
+      <dd>{% include 'stepping_out/_times.html' with start=venue.start end=venue.end datetime_format='H:i' only %}</dd>
       <dd>{% include 'stepping_out/_prices.html' %}</dd>
     </dl>
-    {% with location=scheduled_dance.location %}
+    {% with location=venue.location %}
       <h4>
         <a href="{{ location.get_absolute_url }}">{{ location.name }}</a>
       {% if location.website %}<small>({{ location.website|urlize }})</small>{% endif %}
@@ -35,7 +35,7 @@
     {% endwith %}
   </div>
 
-  <h1>{{ scheduled_dance.name }}{% if scheduled_dance.website %} <small>{{ scheduled_dance.website|urlize }}</small>{% endif %}</h1>
+  <h1>{{ venue.name }}{% if venue.website %} <small>{{ venue.website|urlize }}</small>{% endif %}</h1>
 
   {% include 'stepping_out/dance/_list_grouped.html' %}
 {% endblock %}

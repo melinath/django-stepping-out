@@ -2,18 +2,18 @@ from django.core.exceptions import ValidationError
 import floppyforms as forms
 from pygeocoder import Geocoder
 
-from stepping_out.models import ScheduledDance, Location, Dance
+from stepping_out.models import Venue, Location, Dance
 
 
-class ScheduledDanceForm(forms.ModelForm):
-    weeks = forms.MultipleChoiceField(choices=ScheduledDance.WEEK_CHOICES,
+class VenueForm(forms.ModelForm):
+    weeks = forms.MultipleChoiceField(choices=Venue.WEEK_CHOICES,
                                       widget=forms.CheckboxSelectMultiple)
 
     class Meta:
-        model = ScheduledDance
+        model = Venue
 
     def __init__(self, *args, **kwargs):
-        super(ScheduledDanceForm, self).__init__(*args, **kwargs)
+        super(VenueForm, self).__init__(*args, **kwargs)
         self.initial['weeks'] = self.instance.weeks.split(',')
 
     def clean_weeks(self):
