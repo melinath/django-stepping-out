@@ -57,6 +57,7 @@ def _get_or_create_scheduled(start, end, location=None, venues=None,
         # Now we have to get the ones that actually fall in the time range.
         q = Q(end__gte=start,
               start__lte=end,
+              start__isnull=False,
               sites=site)
         if location is not None:
             q = q & Q(location=location)
@@ -70,7 +71,7 @@ def _get_or_create_scheduled(start, end, location=None, venues=None,
             dances = []
 
         return sorted(itertools.chain(dances, lessons),
-                      key=operator.attrgetter('original_day'))
+                      key=operator.attrgetter('start'))
 
 
 def _group_events(events):
