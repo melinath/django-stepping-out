@@ -1,5 +1,7 @@
 body { padding-bottom: 80px; }
 
+time[title] { border-bottom: 1px dotted #999; }
+
 .icon-media { width: 64px; height: 64px; font-size: 48px; line-height: 64px; text-align: center; text-decoration: none; color: #000; }
 
 .hero-unit .media-heading { line-height: 48px; font-size: 28px; }
