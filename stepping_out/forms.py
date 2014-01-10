@@ -2,23 +2,25 @@ from django.core.exceptions import ValidationError
 import floppyforms as forms
 from pygeocoder import Geocoder
 
-from stepping_out.models import (Venue, Location, Dance, DanceTemplate,
-                                 Lesson, LessonTemplate)
+from stepping_out.models import (ScheduleBase, Location, Dance, DanceTemplate,
+                                 Lesson, LessonTemplate, Venue)
 
 
-class VenueForm(forms.ModelForm):
-    weeks = forms.MultipleChoiceField(choices=Venue.WEEK_CHOICES,
+class ScheduleBaseForm(forms.ModelForm):
+    weeks = forms.MultipleChoiceField(choices=ScheduleBase.WEEK_CHOICES,
                                       widget=forms.CheckboxSelectMultiple)
 
-    class Meta:
-        model = Venue
-
     def __init__(self, *args, **kwargs):
-        super(VenueForm, self).__init__(*args, **kwargs)
+        super(ScheduleBaseForm, self).__init__(*args, **kwargs)
         self.initial['weeks'] = self.instance.weeks.split(',')
 
     def clean_weeks(self):
         return ','.join(self.cleaned_data['weeks'])
+
+
+class VenueForm(ScheduleBaseForm):
+    class Meta:
+        model = Venue
 
 
 class LocationForm(forms.ModelForm):
@@ -102,3 +104,15 @@ class LessonCreateForm(forms.ModelForm):
             return template.get_or_create_dance(start_day, series)[0]
 
         return super(DanceCreateForm, self).save(**kwargs)
+
+
+class LessonTemplateForm(forms.ModelForm):
+    model = LessonTemplate
+
+    def save(self, commit=True):
+        instance = super(LessonTemplateForm, self).save(commit)
+        if instance.dance_template:
+            sites = list(instance.sites.all() |
+                         instance.dance_template.sites.all())
+            instance.sites = sites
+        return instance

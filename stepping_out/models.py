@@ -259,8 +259,10 @@ class Lesson(BasePriceModel):
         if self.start is None:
             return self.name
         start = self.start.astimezone(get_current_timezone())
-        return u"{0} ({1}, {2})".format(self.name, self.dance.name,
-                                        start.strftime("%Y-%m-%d"))
+        if self.dance:
+            return u"{0} ({1}, {2})".format(self.name, self.dance.name,
+                                            start.strftime("%Y-%m-%d"))
+        return u"{0} ({1})".format(self.name, start.strftime("%Y-%m-%d"))
 
 
 class DanceTemplate(BasePriceModel):
@@ -486,6 +488,9 @@ class Series(ScheduleBase):
         blank=True)
     description = models.TextField(blank=True)
     lesson_template = models.ForeignKey(LessonTemplate, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = 'Series'
 
     def __unicode__(self):
         return self.name

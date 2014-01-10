@@ -3,7 +3,8 @@ from django.contrib import admin
 from django.db import models
 from django.template.loader import render_to_string
 
-from stepping_out.forms import VenueForm, LocationForm, DanceCreateForm
+from stepping_out.forms import (VenueForm, LocationForm, DanceCreateForm,
+                                LessonTemplateForm)
 from stepping_out.models import (Venue,
                                  Location, Dance, Lesson, Person, DanceDJ,
                                  DanceLiveAct, DanceTemplate, LessonTemplate)
@@ -16,7 +17,8 @@ class VenueAdmin(admin.ModelAdmin):
             'fields': ('name', 'banner', 'description', 'website'),
         }),
         ('Scheduling', {
-            'fields': ('weekday', 'weeks', 'dance_template'),
+            'fields': ('weekday', 'weeks', 'start_day', 'end_day',
+                       'dance_template'),
         }),
     )
     list_display = ['name', 'get_schedule']
@@ -30,6 +32,7 @@ class VenueAdmin(admin.ModelAdmin):
 
 class LessonTemplateInline(admin.StackedInline):
     model = LessonTemplate
+    form = LessonTemplateForm
     fieldsets = (
         (None, {
             'fields': ('name', 'description'),
@@ -43,6 +46,10 @@ class LessonTemplateInline(admin.StackedInline):
         })
     )
     extra = 1
+
+    def save_model(self, request, obj, form, change):
+        super(LessonTemplateInline, self).save_model(request, obj, form, change)
+        obj.sites = obj.dance_template.sites.all()
 
 
 class DanceTemplateAdmin(admin.ModelAdmin):

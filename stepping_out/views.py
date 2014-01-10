@@ -33,10 +33,11 @@ def _get_or_create_scheduled(start, end, location=None, venues=None,
              Q(start_day__lte=start_day, end_day__isnull=True) |
              Q(start_day__isnull=True, end_day__isnull=True))
         if venues is None and series is None:
-            venues = Venue.objects.filter(q, dance_template__sites=site
-                                          ).distinct()
-            series = Series.objects.filter(q, lesson_template__sites=site
-                                           ).distinct()
+            v = Venue.objects.filter(q, dance_template__sites=site
+                                     ).distinct()
+            s = Series.objects.filter(q, lesson_template__sites=site
+                                      ).distinct()
+            schedulers = itertools.chain(v or [], s or [])
 
         scheduled_map = {}
         for s in itertools.chain(dances, lessons):
@@ -48,7 +49,7 @@ def _get_or_create_scheduled(start, end, location=None, venues=None,
             if scheduler is not None:
                 scheduled_map.setdefault(s.original_day, set()).add(scheduler)
 
-        for scheduler in itertools.chain(venues or [], series or []):
+        for scheduler in schedulers:
             for day in scheduler.days_in_range(start_day, end_day):
                 if (day not in scheduled_map or
                         scheduler not in scheduled_map[day]):
@@ -69,6 +70,9 @@ def _get_or_create_scheduled(start, end, location=None, venues=None,
         elif series:
             lessons = lessons.filter(series__in=series)
             dances = []
+        else:
+            dances = list(dances)
+            lessons = lessons.exclude(dance__in=dances)
 
         return sorted(itertools.chain(dances, lessons),
                       key=operator.attrgetter('start'))
