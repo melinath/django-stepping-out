@@ -1,5 +1,7 @@
 import datetime
+import operator
 
+from dateutil import rrule
 from django.contrib.sites.models import Site
 from django.db import models
 from django.template.defaultfilters import slugify
@@ -243,7 +245,8 @@ class Lesson(BasePriceModel):
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
-    series = models.ForeignKey('Series', blank=True, null=True)
+    series = models.ForeignKey('Series', related_name='lessons', blank=True, null=True)
+    sites = models.ManyToManyField(Site, blank=True)
 
     # This field is used internally for recurring events to track when
     # a single instance is modified.
@@ -329,6 +332,7 @@ class LessonTemplate(BasePriceModel):
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     dance_included = models.BooleanField(default=True)
+    sites = models.ManyToManyField(Site, blank=True)
 
     def __unicode__(self):
         if self.dance_template:
@@ -368,10 +372,14 @@ class LessonTemplate(BasePriceModel):
                 'original_day__month': start_day.month,
                 'original_day__day': start_day.day,
             }
-            return Lesson.objects.get_or_create(defaults=defaults,
-                                                **kwargs)
+            lesson, created = Lesson.objects.get_or_create(defaults=defaults,
+                                                           **kwargs)
         else:
-            return Lesson.objects.create(**defaults), True
+            created = True
+            lesson = Lesson.objects.create(**defaults)
+        if created:
+            lesson.sites = self.sites.all()
+        return dance, created
 
 
 class ScheduleBase(models.Model):
@@ -406,35 +414,34 @@ class ScheduleBase(models.Model):
         return [week[1] for week in self.WEEK_CHOICES
                 if unicode(week[0]) in self.weeks]
 
-    def days_in_month(self, month):
-        # month is an integer, 1-12.
-        days = []
-        now = datetime.datetime.now(get_current_timezone())
-        month_start = datetime.date(now.year, month, 1)
-        until_first = (7 - month_start.weekday() + self.weekday) % 7
+    def days_in_range(self, start_day, end_day):
+        if end_day < start_day:
+            start_day, end_day = end_day, start_day
+        kwargs = {
+            'byweekday': self.weekday,
+            'dtstart': datetime.datetime.combine(start_day, datetime.time(0)),
+            'until': datetime.datetime.combine(end_day, datetime.time(0)),
+        }
+        days = rrule.rrule(rrule.WEEKLY, **kwargs)
 
-        first_day = month_start + datetime.timedelta(until_first)
+        return [day.date() for day in days
+                if str(day.day // 7 + 1) in self.weeks]
 
-        for week in self.WEEK_CHOICES:
-            if unicode(week[0]) in self.weeks:
-                days.append(first_day + datetime.timedelta(7 * (week[0] - 1)))
+    def _get_scheduled(self, start_day, end_day):
+        raise NotImplementedError
 
-        return days
+    def _create_for_day(self, day):
+        raise NotImplementedError
 
-    def get_next_date(self):
-        now = datetime.datetime.now(get_current_timezone())
-        today = now.date()
-        time = now.time()
-
-        for month in [now.month, now.month + 1]:
-            days = self.days_in_month(month)
-            for day in days:
-                if day > today:
-                    return day
-                if day == today and self.start > time:
-                    return day
-
-        raise ValueError("No next date found.")
+    def get_or_create_scheduled(self, start_day, end_day):
+        all_days = self.days_in_range(start_day, end_day)
+        scheduled = list(self._get_scheduled(start_day, end_day))
+        scheduled_days = [s.original_day for s in scheduled]
+        missing_days = set(all_days) - set(scheduled_days)
+        for day in missing_days:
+            scheduled.append(self._create_for_day(day))
+        scheduled.sort(key=operator.attrgetter('original_day'))
+        return scheduled
 
 
 class Venue(ScheduleBase):
@@ -458,6 +465,15 @@ class Venue(ScheduleBase):
     def __unicode__(self):
         return self.name
 
+    def _get_scheduled(self, start_day, end_day):
+        return self.dances.filter(original_day__gte=start_day,
+                                  original_day__lte=end_day)
+
+    def _create_for_day(self, day):
+        if self.dance_template is None:
+            raise ValueError
+        return self.dance_template.get_or_create_dance(day, venue=self)[0]
+
 
 class Series(ScheduleBase):
     """
@@ -473,3 +489,12 @@ class Series(ScheduleBase):
 
     def __unicode__(self):
         return self.name
+
+    def _create_for_day(self, day):
+        if self.lesson_template is None:
+            raise ValueError
+        return self.lesson_template.get_or_create_lesson(day, series=self)[0]
+
+    def _get_scheduled(self, start_day, end_day):
+        return self.lessons.filter(original_day__gte=start_day,
+                                   original_day__lte=end_day)

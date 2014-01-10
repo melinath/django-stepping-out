@@ -2,14 +2,14 @@ from django.conf.urls import patterns, url
 from django.views.generic import ListView
 
 from stepping_out.models import Venue, Location, Person, LiveAct
-from stepping_out.views import (VenueDetailView, UpcomingDancesView,
+from stepping_out.views import (VenueDetailView, UpcomingEventView,
                                 FakeSlugDetailView, DanceDetailView,
                                 LocationDetailView)
 
 
 urlpatterns = patterns('',
     url(r'^$',
-        UpcomingDancesView.as_view(),
+        UpcomingEventView.as_view(),
         name='stepping_out_dances'),
 
     url(r'^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<pk>\d+)/(?:(?P<slug>[\w-]+)/)?$',

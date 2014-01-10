@@ -1,0 +1,17 @@
+{% load daguerre %}
+{% for day, events in events_grouped %}
+  {% if day == today %}
+    {% adjust_bulk events 'banner' 'fill' width=128 height=128 as adjusted %}
+    <div class='hero-unit'>
+      <h1>Today</h1>
+      {% for event, image in adjusted %}
+        {% include "stepping_out/event/_leadin.html" with date=0 %}
+      {% endfor %}
+    </div>
+  {% else %}
+    {% adjust_bulk events 'banner' 'fill' width=64 height=64 as adjusted %}
+    {% for event, image in adjusted %}
+      {% include "stepping_out/event/_leadin.html" with date=1 %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
